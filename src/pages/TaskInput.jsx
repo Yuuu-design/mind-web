@@ -2,42 +2,49 @@ import React, { useState, useRef } from 'react'
 import Button from '../components/Button'
 import BackButton from '../components/BackButton'
 
-export default function NormalTask({ onAddTodo, onNext, onBack, onGoHome }) {
-  const [tasks, setTasks] = useState([''])
+export default function TaskInput({ onAddTodo, onBack, onGoHome }) {
+  const [tasks, setTasks] = useState({
+    urgent: [''],
+    normal: ['']
+  })
+  const [activeType, setActiveType] = useState('urgent') // 'urgent' | 'normal'
   const [showExitConfirm, setShowExitConfirm] = useState(false)
   const inputAreaRef = useRef(null)
 
-  // 点击空白区域返回首页
-  const handleBackgroundClick = (e) => {
-    if (inputAreaRef.current?.contains(e.target)) return
-    if (tasks.some(t => t.trim())) return
-    onGoHome()
+  const currentTasks = tasks[activeType]
+  const hasAnyContent = tasks.urgent.some(t => t.trim()) || tasks.normal.some(t => t.trim())
+
+  const handleChange = (type, idx, val) => {
+    setTasks(prev => {
+      const next = { ...prev }
+      next[type] = [...next[type]]
+      next[type][idx] = val
+      return next
+    })
   }
 
-  const handleChange = (idx, val) => {
-    const next = [...tasks]
-    next[idx] = val
-    setTasks(next)
-  }
-
-  const handleKeyDown = (idx, e) => {
+  const handleKeyDown = (type, idx, e) => {
     if (e.key === 'Enter') {
       e.preventDefault()
-      const next = [...tasks]
-      next.push('')
-      setTasks(next)
+      setTasks(prev => {
+        const next = { ...prev }
+        next[type] = [...next[type]]
+        next[type].push('')
+        return next
+      })
       setTimeout(() => {
-        const inputs = document.querySelectorAll('.task-input-normal')
+        const inputs = document.querySelectorAll(`.task-input-${type}`)
         if (inputs[idx + 1]) inputs[idx + 1].focus()
       }, 50)
     }
   }
 
-  const handleNext = (e) => {
-    e.stopPropagation()
-    const valid = tasks.map(t => t.trim()).filter(Boolean)
-    valid.forEach(t => onAddTodo(t, 'normal'))
-    onNext()
+  const handleNext = () => {
+    const validUrgent = tasks.urgent.map(t => t.trim()).filter(Boolean)
+    const validNormal = tasks.normal.map(t => t.trim()).filter(Boolean)
+    validUrgent.forEach(t => onAddTodo(t, 'urgent'))
+    validNormal.forEach(t => onAddTodo(t, 'normal'))
+    onGoHome()
   }
 
   return (
@@ -46,38 +53,59 @@ export default function NormalTask({ onAddTodo, onNext, onBack, onGoHome }) {
       <div className="relative mb-8">
         <button
           onClick={() => {
-            if (tasks.some(t => t.trim())) {
+            if (hasAnyContent) {
               setShowExitConfirm(true)
             } else {
-              onGoHome()
+              onBack()
             }
           }}
           className="absolute -top-4 -left-1 w-10 h-10 flex items-center justify-center text-black active:scale-95 transition-transform"
         >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M18 6L6 18M6 6l12 12"/>
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
           </svg>
         </button>
         <div className="pt-8">
           <h2 className="text-2xl font-bold text-black leading-tight">
-            有哪些事未来想做？
+            今天有什么事情需要完成？
           </h2>
-          <span className="inline-block mt-3 bg-gray-200 text-black text-xs font-bold px-3 py-1 rounded-full">
-            不紧急
-          </span>
         </div>
+      </div>
+
+      {/* 胶囊切换 */}
+      <div className="flex bg-gray-100 rounded-full p-1 mb-6">
+        <button
+          onClick={() => setActiveType('urgent')}
+          className={`flex-1 py-2 rounded-full text-sm font-medium transition-all ${
+            activeType === 'urgent'
+              ? 'bg-pink text-white shadow-sm'
+              : 'text-gray-500'
+          }`}
+        >
+          紧急
+        </button>
+        <button
+          onClick={() => setActiveType('normal')}
+          className={`flex-1 py-2 rounded-full text-sm font-medium transition-all ${
+            activeType === 'normal'
+              ? 'bg-black text-white shadow-sm'
+              : 'text-gray-500'
+          }`}
+        >
+          不紧急
+        </button>
       </div>
 
       {/* 输入列表 */}
       <div ref={inputAreaRef} className="flex-1 overflow-y-auto no-scrollbar space-y-3">
-        {tasks.map((t, idx) => (
+        {currentTasks.map((t, idx) => (
           <div key={idx} className="flex items-center gap-3 bg-white rounded-2xl px-4 py-3 shadow-sm">
-            <span className="text-gray-400 font-bold text-lg">○</span>
+            <span className={`font-bold text-lg ${activeType === 'urgent' ? 'text-pink' : 'text-gray-400'}`}>○</span>
             <input
-              className="task-input-normal flex-1 bg-transparent outline-none text-base text-black placeholder:text-gray-400 py-1"
+              className={`task-input-${activeType} flex-1 bg-transparent outline-none text-base text-black placeholder:text-gray-400 py-1`}
               value={t}
-              onChange={(e) => handleChange(idx, e.target.value)}
-              onKeyDown={(e) => handleKeyDown(idx, e)}
+              onChange={(e) => handleChange(activeType, idx, e.target.value)}
+              onKeyDown={(e) => handleKeyDown(activeType, idx, e)}
               placeholder="输入任务..."
               autoFocus={idx === 0}
             />
@@ -86,8 +114,7 @@ export default function NormalTask({ onAddTodo, onNext, onBack, onGoHome }) {
       </div>
 
       {/* 底部 */}
-      <div className="mt-6 flex items-center justify-between" onMouseDown={(e) => e.stopPropagation()}>
-        <BackButton onClick={onBack} />
+      <div className="mt-6 flex justify-end">
         <Button variant="arrow" size="icon" onClick={handleNext} />
       </div>
 
@@ -96,7 +123,7 @@ export default function NormalTask({ onAddTodo, onNext, onBack, onGoHome }) {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-6">
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowExitConfirm(false)} />
           <div className="relative bg-white rounded-card p-6 w-full max-w-sm shadow-2xl animate-pop">
-            <p className="text-base text-black text-center mb-3">您编辑的内容将不会被<br />保存，真的要退出么？</p>
+            <p className="text-base text-black text-center mb-3">您编辑的内容将不会被保存，<br />真的要退出么？</p>
             <div className="flex gap-3">
               <button
                 onClick={() => setShowExitConfirm(false)}

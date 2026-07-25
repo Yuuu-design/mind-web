@@ -3,9 +3,15 @@ import React, { useState } from 'react'
 export default function TodoItem({ item, onComplete, onEdit, onDelete }) {
   const [exiting, setExiting] = useState(false)
 
-  const handleComplete = () => {
+  const handleComplete = (e) => {
+    e.stopPropagation()
     setExiting(true)
     setTimeout(() => onComplete(item.id), 300)
+  }
+
+  const handleDelete = (e) => {
+    e.stopPropagation()
+    onDelete(item.id)
   }
 
   return (
@@ -26,7 +32,7 @@ export default function TodoItem({ item, onComplete, onEdit, onDelete }) {
 
       {/* 中间文字 - 双击编辑 */}
       <span
-        onDoubleClick={() => onEdit(item)}
+        onDoubleClick={(e) => { e.stopPropagation(); onEdit(item) }}
         className="text-sm text-black flex-1 leading-snug cursor-pointer"
       >
         {item.text}
@@ -34,7 +40,7 @@ export default function TodoItem({ item, onComplete, onEdit, onDelete }) {
 
       {/* 右侧删除按钮 */}
       <button
-        onClick={() => onDelete(item.id)}
+        onClick={handleDelete}
         className="w-7 h-7 rounded-full flex items-center justify-center text-gray-400 hover:text-pink hover:bg-white/80 active:scale-90 transition-all"
       >
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

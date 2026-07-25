@@ -1,8 +1,20 @@
-import React, { useState } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 
-export default function InspirationCard({ item, selected, onToggle }) {
-  const [expanded, setExpanded] = useState(false)
+export default function InspirationCard({ item, selected, onToggle, onDelete, onArchive }) {
   const [previewPhoto, setPreviewPhoto] = useState(null)
+  const [showMenu, setShowMenu] = useState(false)
+  const menuRef = useRef(null)
+
+  // 点击空白处关闭菜单
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (showMenu && menuRef.current && !menuRef.current.contains(e.target)) {
+        setShowMenu(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [showMenu])
 
   return (
     <div
@@ -17,9 +29,9 @@ export default function InspirationCard({ item, selected, onToggle }) {
           <h3 className="font-semibold text-black text-base leading-snug">
             {item.title}
           </h3>
-          {/* 默认只显示概括，展开后显示详细内容 */}
-          {expanded && item.detail && (
-            <p className="mt-2 text-sm text-gray-500 leading-relaxed animate-fade-in">
+          {/* 显示详细内容 */}
+          {item.detail && (
+            <p className="mt-2 text-sm text-gray-500 leading-relaxed">
               {item.detail}
             </p>
           )}
@@ -56,31 +68,94 @@ export default function InspirationCard({ item, selected, onToggle }) {
         </div>
       )}
 
-      {/* 底部：日期 + 展开按钮 */}
+      {/* 底部：时间 + 更多按钮 */}
       <div className="mt-3 flex items-center justify-between">
         <span className="text-[10px] text-gray-400">
-          {item.date || ''}
+          {item.time || item.date || ''}
           {item.photos && item.photos.length > 0 && ` · ${item.photos.length}张照片`}
         </span>
 
-        {/* 右下角：展开/收起按钮 */}
-        {(item.detail || (item.photos && item.photos.length > 0)) && (
+        {/* 更多按钮 - 三个点 */}
+        <div className="relative">
           <button
             onClick={(e) => {
               e.stopPropagation()
-              setExpanded(!expanded)
+              setShowMenu(!showMenu)
             }}
-            className="text-[10px] text-cyan font-semibold flex items-center gap-1"
+            className="w-6 h-6 rounded-full flex items-center justify-center text-gray-400 hover:bg-gray-100 transition-all"
           >
-            {expanded ? '收起' : '展开'}
-            <svg
-              width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
-              className={`transition-transform ${expanded ? 'rotate-180' : ''}`}
-            >
-              <path d="M6 9l6 6 6-6"/>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+              <circle cx="5" cy="12" r="1.5"/>
+              <circle cx="12" cy="12" r="1.5"/>
+              <circle cx="19" cy="12" r="1.5"/>
             </svg>
           </button>
-        )}
+
+          {/* 功能菜单弹出 */}
+          {showMenu && (
+            <div ref={menuRef} className="absolute top-8 right-0 bg-white rounded-2xl shadow-xl p-2 w-36 animate-pop z-50">
+              {/* 分享 */}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setShowMenu(false)
+                  alert('分享功能在完整版中启用')
+                }}
+                className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-gray-50 transition-colors"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-500">
+                  <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/>
+                </svg>
+                <span className="text-sm text-black">分享</span>
+              </button>
+
+              {/* 置顶 */}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setShowMenu(false)
+                  alert('置顶功能在完整版中启用')
+                }}
+                className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-gray-50 transition-colors"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-500">
+                  <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+                </svg>
+                <span className="text-sm text-black">置顶</span>
+              </button>
+
+              {/* 归档 */}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setShowMenu(false)
+                  onArchive(item.id)
+                }}
+                className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-gray-50 transition-colors"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-500">
+                  <polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/>
+                </svg>
+                <span className="text-sm text-black">归档</span>
+              </button>
+
+              {/* 删除 */}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setShowMenu(false)
+                  onDelete(item.id)
+                }}
+                className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-gray-50 transition-colors"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-pink">
+                  <path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                </svg>
+                <span className="text-sm text-pink">删除</span>
+              </button>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* 照片预览弹窗 */}

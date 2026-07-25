@@ -9,6 +9,7 @@ export default function Todo({ todos, onComplete, onAddTodo, onUpdateTodo, onDel
   const [showNightCheck, setShowNightCheck] = useState(false)
   const [editingId, setEditingId] = useState(null)
   const [editText, setEditText] = useState('')
+  const [activeType, setActiveType] = useState('urgent') // 'urgent' | 'normal'
   // 行内添加状态
   const [addType, setAddType] = useState(null) // 'urgent' | 'normal' | null
   const [addText, setAddText] = useState('')
@@ -75,139 +76,140 @@ export default function Todo({ todos, onComplete, onAddTodo, onUpdateTodo, onDel
         <BackButton onClick={() => onChangeNav('home')} />
         <div className="flex-1">
           <h1 className="text-2xl font-bold text-black">今日待办</h1>
-          <p className="text-xs text-gray-400 mt-1">
-            {now.getMonth()+1}月{now.getDate()}日 · 点击完成
-          </p>
         </div>
       </div>
 
+      {/* 胶囊切换 */}
+      <div className="flex bg-gray-100 rounded-full p-1 mb-4">
+        <button
+          onClick={() => setActiveType('urgent')}
+          className={`flex-1 py-2 rounded-full text-sm font-medium transition-all ${
+            activeType === 'urgent'
+              ? 'bg-pink text-white shadow-sm'
+              : 'text-gray-500'
+          }`}
+        >
+          紧急 {urgentTodos.length > 0 && `(${urgentTodos.length})`}
+        </button>
+        <button
+          onClick={() => setActiveType('normal')}
+          className={`flex-1 py-2 rounded-full text-sm font-medium transition-all ${
+            activeType === 'normal'
+              ? 'bg-black text-white shadow-sm'
+              : 'text-gray-500'
+          }`}
+        >
+          不紧急 {normalTodos.length > 0 && `(${normalTodos.length})`}
+        </button>
+      </div>
+
       {/* 任务列表 */}
-      <div className="flex-1 overflow-y-auto no-scrollbar space-y-6">
-        {/* 紧急 */}
-        <div className="bg-white rounded-card p-4 shadow-sm">
-          <div className="flex items-center gap-2 mb-3">
-            <span className="w-2 h-2 rounded-full bg-pink" />
-            <span className="text-xs font-bold text-pink">紧急</span>
-            <span className="text-[10px] text-gray-400">{urgentTodos.length} 项</span>
-            {/* 添加按钮 */}
-            <button
-              onClick={() => setAddType('urgent')}
-              className="ml-auto w-6 h-6 rounded-full bg-pink/20 flex items-center justify-center text-pink active:scale-90 transition-transform"
-            >
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 5v14M5 12h14"/>
-              </svg>
-            </button>
-          </div>
-
-          {/* 行内添加输入框 */}
-          {addType === 'urgent' && (
-            <div className="flex items-center gap-2 bg-pink/10 rounded-2xl px-3 py-2 mb-2 animate-fade-in">
-              <input
-                value={addText}
-                onChange={(e) => setAddText(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') handleAdd()
-                  if (e.key === 'Escape') { setAddType(null); setAddText('') }
-                }}
-                placeholder="输入紧急待办..."
-                autoFocus
-                className="flex-1 bg-transparent outline-none text-sm text-black py-1 placeholder:text-pink/50"
-              />
-              <button onClick={handleAdd} className="text-xs text-pink font-semibold px-2 py-1">确定</button>
-              <button onClick={() => { setAddType(null); setAddText('') }} className="text-xs text-gray-400 px-2 py-1">取消</button>
-            </div>
-          )}
-
-          <div className="space-y-2">
-            {urgentTodos.length === 0 ? (
-              <p className="text-xs text-gray-300 py-2 text-center">暂无紧急事项</p>
-            ) : (
-              urgentTodos.map(t => (
-                <div key={t.id}>
-                  {editingId === t.id ? (
-                    <EditForm
-                      ref={editInputRef}
-                      value={editText}
-                      onChange={setEditText}
-                      onSave={handleSaveEdit}
-                    />
-                  ) : (
-                    <TodoItem
-                      item={t}
-                      onComplete={onComplete}
-                      onEdit={() => handleStartEdit(t)}
-                      onDelete={onDeleteTodo}
-                    />
-                  )}
-                </div>
-              ))
+      <div className="flex-1 overflow-y-auto no-scrollbar">
+        {/* 紧急列表 */}
+        {activeType === 'urgent' && (
+          <div
+            className="bg-white rounded-card p-4 shadow-sm cursor-pointer"
+            onClick={() => setAddType('urgent')}
+          >
+            {/* 行内添加输入框 */}
+            {addType === 'urgent' && (
+              <div className="flex items-center gap-2 bg-pink/10 rounded-2xl px-3 py-2 mb-2 animate-fade-in" onClick={(e) => e.stopPropagation()}>
+                <input
+                  value={addText}
+                  onChange={(e) => setAddText(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') handleAdd()
+                    if (e.key === 'Escape') { setAddType(null); setAddText('') }
+                  }}
+                  placeholder="输入紧急待办..."
+                  autoFocus
+                  className="flex-1 bg-transparent outline-none text-sm text-black py-1 placeholder:text-pink/50"
+                />
+                <button onClick={(e) => { e.stopPropagation(); handleAdd() }} className="text-xs text-pink font-semibold px-2 py-1">确定</button>
+                <button onClick={(e) => { e.stopPropagation(); setAddType(null); setAddText('') }} className="text-xs text-gray-400 px-2 py-1">取消</button>
+              </div>
             )}
-          </div>
-        </div>
 
-        {/* 不紧急 */}
-        <div className="bg-white rounded-card p-4 shadow-sm">
-          <div className="flex items-center gap-2 mb-3">
-            <span className="w-2 h-2 rounded-full bg-gray-400" />
-            <span className="text-xs font-bold text-gray-500">不紧急</span>
-            <span className="text-[10px] text-gray-400">{normalTodos.length} 项</span>
-            {/* 添加按钮 */}
-            <button
-              onClick={() => setAddType('normal')}
-              className="ml-auto w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 active:scale-90 transition-transform"
-            >
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 5v14M5 12h14"/>
-              </svg>
-            </button>
-          </div>
-
-          {/* 行内添加输入框 */}
-          {addType === 'normal' && (
-            <div className="flex items-center gap-2 bg-gray-100 rounded-2xl px-3 py-2 mb-2 animate-fade-in">
-              <input
-                value={addText}
-                onChange={(e) => setAddText(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') handleAdd()
-                  if (e.key === 'Escape') { setAddType(null); setAddText('') }
-                }}
-                placeholder="输入待办..."
-                autoFocus
-                className="flex-1 bg-transparent outline-none text-sm text-black py-1 placeholder:text-gray-400"
-              />
-              <button onClick={handleAdd} className="text-xs text-cyan font-semibold px-2 py-1">确定</button>
-              <button onClick={() => { setAddType(null); setAddText('') }} className="text-xs text-gray-400 px-2 py-1">取消</button>
+            <div className="space-y-2">
+              {urgentTodos.length === 0 ? (
+                <p className="text-xs text-gray-300 py-2 text-center">暂无紧急事项</p>
+              ) : (
+                urgentTodos.map(t => (
+                  <div key={t.id} onMouseDown={(e) => e.stopPropagation()}>
+                    {editingId === t.id ? (
+                      <EditForm
+                        ref={editInputRef}
+                        value={editText}
+                        onChange={setEditText}
+                        onSave={handleSaveEdit}
+                      />
+                    ) : (
+                      <TodoItem
+                        item={t}
+                        onComplete={onComplete}
+                        onEdit={() => handleStartEdit(t)}
+                        onDelete={onDeleteTodo}
+                      />
+                    )}
+                  </div>
+                ))
+              )}
             </div>
-          )}
-
-          <div className="space-y-2">
-            {normalTodos.length === 0 ? (
-              <p className="text-xs text-gray-300 py-2 text-center">暂无不紧急事项</p>
-            ) : (
-              normalTodos.map(t => (
-                <div key={t.id}>
-                  {editingId === t.id ? (
-                    <EditForm
-                      ref={editInputRef}
-                      value={editText}
-                      onChange={setEditText}
-                      onSave={handleSaveEdit}
-                    />
-                  ) : (
-                    <TodoItem
-                      item={t}
-                      onComplete={onComplete}
-                      onEdit={() => handleStartEdit(t)}
-                      onDelete={onDeleteTodo}
-                    />
-                  )}
-                </div>
-              ))
-            )}
           </div>
-        </div>
+        )}
+
+        {/* 不紧急列表 */}
+        {activeType === 'normal' && (
+          <div
+            className="bg-white rounded-card p-4 shadow-sm cursor-pointer"
+            onClick={() => setAddType('normal')}
+          >
+            {/* 行内添加输入框 */}
+            {addType === 'normal' && (
+              <div className="flex items-center gap-2 bg-gray-100 rounded-2xl px-3 py-2 mb-2 animate-fade-in" onClick={(e) => e.stopPropagation()}>
+                <input
+                  value={addText}
+                  onChange={(e) => setAddText(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') handleAdd()
+                    if (e.key === 'Escape') { setAddType(null); setAddText('') }
+                  }}
+                  placeholder="输入待办..."
+                  autoFocus
+                  className="flex-1 bg-transparent outline-none text-sm text-black py-1 placeholder:text-gray-400"
+                />
+                <button onClick={(e) => { e.stopPropagation(); handleAdd() }} className="text-xs text-cyan font-semibold px-2 py-1">确定</button>
+                <button onClick={(e) => { e.stopPropagation(); setAddType(null); setAddText('') }} className="text-xs text-gray-400 px-2 py-1">取消</button>
+              </div>
+            )}
+
+            <div className="space-y-2">
+              {normalTodos.length === 0 ? (
+                <p className="text-xs text-gray-300 py-2 text-center">暂无不紧急事项</p>
+              ) : (
+                normalTodos.map(t => (
+                  <div key={t.id} onMouseDown={(e) => e.stopPropagation()}>
+                    {editingId === t.id ? (
+                      <EditForm
+                        ref={editInputRef}
+                        value={editText}
+                        onChange={setEditText}
+                        onSave={handleSaveEdit}
+                      />
+                    ) : (
+                      <TodoItem
+                        item={t}
+                        onComplete={onComplete}
+                        onEdit={() => handleStartEdit(t)}
+                        onDelete={onDeleteTodo}
+                      />
+                    )}
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        )}
 
         {todaysTodos.length === 0 && (
           <div className="text-center py-16">

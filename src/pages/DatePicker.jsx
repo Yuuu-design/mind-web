@@ -4,10 +4,25 @@ export default function DatePicker({ year, month, onConfirm, onCancel }) {
   const [y, setY] = useState(year)
   const [m, setM] = useState(month)
 
-  const years = []
-  for (let i = 2024; i <= 2030; i++) years.push(i)
+  const now = new Date()
+  const currentYear = now.getFullYear()
+  const currentMonth = now.getMonth() + 1
 
-  const months = Array.from({ length: 12 }, (_, i) => i + 1)
+  // 年份范围：2024到当前年份
+  const years = []
+  for (let i = 2024; i <= currentYear; i++) years.push(i)
+
+  // 月份范围：根据选中年份限制
+  const maxMonth = y === currentYear ? currentMonth : 12
+  const months = Array.from({ length: maxMonth }, (_, i) => i + 1)
+
+  // 如果当前选中月份超出范围，自动调整
+  const handleYearChange = (newYear) => {
+    setY(newYear)
+    if (newYear === currentYear && m > currentMonth) {
+      setM(currentMonth)
+    }
+  }
 
   return (
     <div className="w-full">
@@ -19,7 +34,7 @@ export default function DatePicker({ year, month, onConfirm, onCancel }) {
           {years.map(year => (
             <button
               key={year}
-              onClick={() => setY(year)}
+              onClick={() => handleYearChange(year)}
               className={`
                 w-full py-2 rounded-xl text-sm font-medium transition-all
                 ${y === year ? 'bg-cyan text-black font-bold' : 'text-gray-600 hover:bg-gray-200'}

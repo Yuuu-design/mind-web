@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import Welcome from './pages/Welcome'
-import UrgentTask from './pages/UrgentTask'
-import NormalTask from './pages/NormalTask'
+import TaskInput from './pages/TaskInput'
 import Home from './pages/Home'
 import Inspiration from './pages/Inspiration'
 import Todo from './pages/Todo'
@@ -34,12 +33,20 @@ export default function App() {
 
   // 添加灵感
   const handleAddInspiration = (title, detail = '', photos = [], synthesized = false) => {
+    const now = new Date()
+    const year = now.getFullYear()
+    const month = now.getMonth() + 1
+    const day = now.getDate()
+    const hours = String(now.getHours()).padStart(2, '0')
+    const minutes = String(now.getMinutes()).padStart(2, '0')
+    const seconds = String(now.getSeconds()).padStart(2, '0')
     const newItem = {
       id: Date.now() + Math.random(),
       title,
       detail,
       photos, // [{ id, data, name }]
       date: getTodayStr(),
+      time: `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`,
       synthesized
     }
     setData(prev => ({
@@ -90,6 +97,24 @@ export default function App() {
     }))
   }
 
+  // 删除灵感（永久删除）
+  const handleDeleteInspirations = (ids) => {
+    setData(prev => ({
+      ...prev,
+      inspirations: prev.inspirations.filter(i => !ids.includes(i.id))
+    }))
+  }
+
+  // 归档灵感
+  const handleArchiveInspiration = (id) => {
+    setData(prev => ({
+      ...prev,
+      inspirations: prev.inspirations.map(i =>
+        i.id === id ? { ...i, archived: true } : i
+      )
+    }))
+  }
+
   // 夜间删除未完成
   const handleDeleteUncompleted = () => {
     const today = getTodayStr()
@@ -124,22 +149,15 @@ export default function App() {
           <Welcome
             onAddInspiration={handleAddInspiration}
             onGoUrgent={() => setPage('urgent')}
+            onGoHome={() => setPage('home')}
           />
         )
       case 'urgent':
         return (
-          <UrgentTask
+          <TaskInput
             onAddTodo={handleAddTodo}
-            onNext={() => setPage('normal')}
             onBack={() => setPage('welcome')}
-          />
-        )
-      case 'normal':
-        return (
-          <NormalTask
-            onAddTodo={handleAddTodo}
-            onNext={() => setPage('home')}
-            onBack={() => setPage('urgent')}
+            onGoHome={() => setPage('home')}
           />
         )
       case 'home':
@@ -157,6 +175,8 @@ export default function App() {
           <Inspiration
             items={data.inspirations}
             onAddInspiration={handleAddInspiration}
+            onDeleteInspirations={handleDeleteInspirations}
+            onArchiveInspiration={handleArchiveInspiration}
             onChangeNav={handleChangeNav}
           />
         )

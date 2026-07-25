@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import BackButton from '../components/BackButton'
 
 export default function Settings({
@@ -8,10 +8,13 @@ export default function Settings({
   onChangeNav,
   onResetData
 }) {
+  const [showArchive, setShowArchive] = useState(false)
+
   // 统计数据
-  const totalInsp = inspirations.length
+  const totalInsp = inspirations.filter(i => !i.archived).length
   const totalDone = todos.filter(t => t.completed).length
   const synthesized = inspirations.filter(i => i.synthesized).length
+  const archived = inspirations.filter(i => i.archived)
 
   return (
     <div className="h-full flex flex-col px-6 pt-14 pb-8 animate-fade-in">
@@ -51,10 +54,23 @@ export default function Settings({
       </div>
 
       {/* 灵感归档 */}
-      <div className="bg-white rounded-card p-5 shadow-sm mb-4">
-        <h3 className="text-sm font-bold">灵感归档</h3>
-        <p className="text-xs text-gray-400 mt-1">查看所有历史灵感</p>
-      </div>
+      <button
+        onClick={() => setShowArchive(true)}
+        className="bg-white rounded-card p-5 shadow-sm mb-4 text-left flex items-center justify-between"
+      >
+        <div>
+          <h3 className="text-sm font-bold">灵感归档</h3>
+          <p className="text-xs text-gray-400 mt-1">查看已归档的灵感</p>
+        </div>
+        <div className="flex items-center gap-2">
+          {archived.length > 0 && (
+            <span className="text-xs bg-pink/20 text-pink px-2 py-0.5 rounded-full">{archived.length}</span>
+          )}
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400">
+            <path d="M9 18l6-6-6-6"/>
+          </svg>
+        </div>
+      </button>
 
       {/* 基本设置 */}
       <div className="bg-white rounded-card p-5 shadow-sm">
@@ -71,6 +87,38 @@ export default function Settings({
         </div>
       </div>
 
+      {/* 灵感归档弹窗 */}
+      {showArchive && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-6">
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowArchive(false)} />
+          <div className="relative bg-white rounded-card p-6 w-full max-w-sm shadow-2xl animate-pop max-h-[70vh] overflow-y-auto no-scrollbar">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold">灵感归档</h3>
+              <button
+                onClick={() => setShowArchive(false)}
+                className="w-6 h-6 rounded-full flex items-center justify-center text-gray-400 hover:bg-gray-100"
+              >
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M18 6L6 18M6 6l12 12"/>
+                </svg>
+              </button>
+            </div>
+            {archived.length === 0 ? (
+              <p className="text-sm text-gray-400 text-center py-6">暂无归档的灵感</p>
+            ) : (
+              <div className="space-y-3">
+                {archived.map(i => (
+                  <div key={i.id} className="bg-gray-50 rounded-xl p-3">
+                    <div className="font-medium text-sm text-black">{i.title}</div>
+                    {i.detail && <div className="text-xs text-gray-500 mt-1">{i.detail}</div>}
+                    <div className="text-[10px] text-gray-400 mt-2">{i.time || i.date}</div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   )
 }

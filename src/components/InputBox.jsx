@@ -1,27 +1,38 @@
-import React, { useRef, useEffect } from 'react'
+import React, { useRef, useEffect, forwardRef } from 'react'
 
-export default function InputBox({
+const InputBox = forwardRef(function InputBox({
   value,
   onChange,
   placeholder = '输入内容...',
   autoFocus = false,
   multiline = false,
   className = ''
-}) {
-  const ref = useRef(null)
+}, externalRef) {
+  const internalRef = useRef(null)
 
   useEffect(() => {
-    if (autoFocus && ref.current) {
-      ref.current.focus()
+    if (autoFocus && internalRef.current) {
+      internalRef.current.focus()
     }
   }, [autoFocus])
+
+  // 暴露方法给父组件
+  useEffect(() => {
+    if (externalRef) {
+      if (typeof externalRef === 'function') {
+        externalRef(internalRef.current)
+      } else {
+        externalRef.current = internalRef.current
+      }
+    }
+  }, [externalRef])
 
   const base = 'w-full bg-transparent outline-none text-base text-black placeholder:text-gray-400 resize-none'
 
   if (multiline) {
     return (
       <textarea
-        ref={ref}
+        ref={internalRef}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
@@ -33,7 +44,7 @@ export default function InputBox({
 
   return (
     <input
-      ref={ref}
+      ref={internalRef}
       type="text"
       value={value}
       onChange={(e) => onChange(e.target.value)}
@@ -41,4 +52,6 @@ export default function InputBox({
       className={`${base} py-2 ${className}`}
     />
   )
-}
+})
+
+export default InputBox

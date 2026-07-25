@@ -5,22 +5,24 @@ import { synthesizeIdeas } from '../data/mockAI'
 import Button from '../components/Button'
 import BackButton from '../components/BackButton'
 
-export default function Inspiration({ items, onAddInspiration, onChangeNav }) {
+export default function Inspiration({ items, onAddInspiration, onDeleteInspirations, onArchiveInspiration, onChangeNav }) {
   const [selected, setSelected] = useState([])
   const [synthesizing, setSynthesizing] = useState(false)
   const [result, setResult] = useState(null)
   const [editable, setEditable] = useState({ title: '', detail: '' })
   const [showLibrary, setShowLibrary] = useState(false)
 
-  // 随机排序 - 只展示未合成的原始灵感
+  // 随机排序 - 排除已归档
   const shuffled = useMemo(() => {
-    const arr = items.filter(i => !i.synthesized)
+    const arr = items.filter(i => !i.archived)
     for (let i = arr.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1))
       ;[arr[i], arr[j]] = [arr[j], arr[i]]
     }
     return arr
   }, [items])
+
+  console.log('Inspiration page - items:', items, 'shuffled:', shuffled)
 
   // 合成库
   const synthesizedItems = useMemo(() => {
@@ -58,6 +60,13 @@ export default function Inspiration({ items, onAddInspiration, onChangeNav }) {
     setEditable({ title: '', detail: '' })
   }
 
+  // 删除选中的灵感（移入归档）
+  const handleDeleteSelected = () => {
+    if (selected.length === 0) return
+    onDeleteInspirations(selected)
+    setSelected([])
+  }
+
   return (
     <div className="h-full flex flex-col px-6 pt-14 pb-8 animate-fade-in">
       {/* 顶部 */}
@@ -72,11 +81,6 @@ export default function Inspiration({ items, onAddInspiration, onChangeNav }) {
         </button>
       </div>
 
-      {/* 提示 */}
-      <p className="text-xs text-gray-400 mb-4">
-        点击卡片选择，合成新创意
-      </p>
-
       {/* 灵感卡片列表 - 随机分布 */}
       <div className="flex-1 overflow-y-auto no-scrollbar space-y-3 pb-4">
         {shuffled.length === 0 ? (
@@ -90,6 +94,8 @@ export default function Inspiration({ items, onAddInspiration, onChangeNav }) {
               item={item}
               selected={selected.includes(item.id)}
               onToggle={toggleSelect}
+              onDelete={(id) => onDeleteInspirations([id])}
+              onArchive={onArchiveInspiration}
             />
           ))
         )}
@@ -102,6 +108,9 @@ export default function Inspiration({ items, onAddInspiration, onChangeNav }) {
             <span className="text-xs text-gray-500 flex-1">
               已选 {selected.length} 个灵感
             </span>
+            <Button variant="light" size="sm" onClick={handleDeleteSelected}>
+              删除
+            </Button>
             {selected.length >= 2 ? (
               <Button variant="primary" size="sm" onClick={handleSynthesize}>
                 合成
