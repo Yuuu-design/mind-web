@@ -11,16 +11,24 @@ export default function Inspiration({ items, onAddInspiration, onDeleteInspirati
   const [result, setResult] = useState(null)
   const [editable, setEditable] = useState({ title: '', detail: '' })
   const [showLibrary, setShowLibrary] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
 
-  // 随机排序 - 排除已归档
+  // 随机排序 + 搜索过滤
   const shuffled = useMemo(() => {
-    const arr = items.filter(i => !i.archived)
+    let arr = [...items]
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase()
+      arr = arr.filter(i =>
+        i.title.toLowerCase().includes(query) ||
+        (i.detail && i.detail.toLowerCase().includes(query))
+      )
+    }
     for (let i = arr.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1))
       ;[arr[i], arr[j]] = [arr[j], arr[i]]
     }
     return arr
-  }, [items])
+  }, [items, searchQuery])
 
   console.log('Inspiration page - items:', items, 'shuffled:', shuffled)
 
@@ -75,17 +83,44 @@ export default function Inspiration({ items, onAddInspiration, onDeleteInspirati
         <h1 className="text-2xl font-bold text-black flex-1">灵感</h1>
         <button
           onClick={() => setShowLibrary(true)}
-          className="text-xs text-gray-500 bg-white px-3 py-1.5 rounded-full border border-gray-200"
+          className="w-10 h-10 flex items-center justify-center text-gray-500"
         >
-          合成库
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/>
+          </svg>
         </button>
+      </div>
+
+      {/* 搜索框 */}
+      <div className="mb-4">
+        <div className="flex items-center gap-2 bg-white rounded-full px-4 py-2 shadow-sm border border-gray-100">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-400">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <input
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="搜索灵感..."
+            className="flex-1 bg-transparent outline-none text-sm text-black placeholder:text-gray-400"
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery('')}
+              className="w-5 h-5 rounded-full flex items-center justify-center text-gray-400 hover:bg-gray-100"
+            >
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M18 6L6 18M6 6l12 12"/>
+              </svg>
+            </button>
+          )}
+        </div>
       </div>
 
       {/* 灵感卡片列表 - 随机分布 */}
       <div className="flex-1 overflow-y-auto no-scrollbar space-y-3 pb-4">
         {shuffled.length === 0 ? (
-          <div className="text-center py-20 text-gray-400 text-sm">
-            还没有灵感，先去记录吧 ✨
+          <div className="flex flex-col items-center justify-center py-20">
+            <img src={'/export (2).svg'} alt="暂无灵感" className="w-45 h-45 object-contain" />
           </div>
         ) : (
           shuffled.map(item => (

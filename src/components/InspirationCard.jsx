@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react'
 
 export default function InspirationCard({ item, selected, onToggle, onDelete, onArchive }) {
+  const [expanded, setExpanded] = useState(false)
   const [previewPhoto, setPreviewPhoto] = useState(null)
   const [showMenu, setShowMenu] = useState(false)
   const menuRef = useRef(null)
@@ -23,15 +24,15 @@ export default function InspirationCard({ item, selected, onToggle, onDelete, on
         ${selected ? 'ring-2 ring-cyan shadow-lg' : 'hover:shadow-md'}
       `}
     >
-      {/* 卡片主体 - 点击切换选择状态 */}
-      <div onClick={() => onToggle(item.id)} className="flex items-start justify-between gap-3">
+      {/* 卡片主体 - 点击展开/收起 */}
+      <div onClick={() => setExpanded(!expanded)} className="flex items-start justify-between gap-3">
         <div className="flex-1 min-w-0">
           <h3 className="font-semibold text-black text-base leading-snug">
             {item.title}
           </h3>
-          {/* 显示详细内容 */}
-          {item.detail && (
-            <p className="mt-2 text-sm text-gray-500 leading-relaxed">
+          {/* 展开后显示详细内容 */}
+          {expanded && item.detail && (
+            <p className="mt-2 text-sm text-gray-500 leading-relaxed animate-fade-in">
               {item.detail}
             </p>
           )}
@@ -50,9 +51,9 @@ export default function InspirationCard({ item, selected, onToggle, onDelete, on
         </div>
       </div>
 
-      {/* 照片预览 */}
-      {item.photos && item.photos.length > 0 && (
-        <div className="mt-3 flex gap-2 flex-wrap">
+      {/* 展开后显示照片 */}
+      {expanded && item.photos && item.photos.length > 0 && (
+        <div className="mt-3 flex gap-2 flex-wrap animate-fade-in">
           {item.photos.map(p => (
             <div
               key={p.id}

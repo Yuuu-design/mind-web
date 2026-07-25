@@ -10,6 +10,8 @@ export default function Todo({ todos, onComplete, onAddTodo, onUpdateTodo, onDel
   const [editingId, setEditingId] = useState(null)
   const [editText, setEditText] = useState('')
   const [activeType, setActiveType] = useState('urgent') // 'urgent' | 'normal'
+  const [showConfetti, setShowConfetti] = useState(false)
+  const [prevTodosCount, setPrevTodosCount] = useState(0)
   // 行内添加状态
   const [addType, setAddType] = useState(null) // 'urgent' | 'normal' | null
   const [addText, setAddText] = useState('')
@@ -21,6 +23,15 @@ export default function Todo({ todos, onComplete, onAddTodo, onUpdateTodo, onDel
 
   const urgentTodos = todaysTodos.filter(t => t.type === 'urgent')
   const normalTodos = todaysTodos.filter(t => t.type === 'normal')
+
+  // 检测是否完成所有待办，触发彩带
+  useEffect(() => {
+    if (prevTodosCount > 0 && todaysTodos.length === 0) {
+      setShowConfetti(true)
+      setTimeout(() => setShowConfetti(false), 3000)
+    }
+    setPrevTodosCount(todaysTodos.length)
+  }, [todaysTodos.length])
 
   // 22:00 夜间检查
   useEffect(() => {
@@ -213,11 +224,31 @@ export default function Todo({ todos, onComplete, onAddTodo, onUpdateTodo, onDel
 
         {todaysTodos.length === 0 && (
           <div className="text-center py-16">
-            <div className="text-4xl mb-3">🎉</div>
-            <p className="text-sm text-gray-400">今日无事，恭喜！</p>
+            <img src="/export (1).svg" alt="礼花" className="w-45 h-45 mx-auto mb-2 object-contain" />
+            <p className="text-xs text-gray-400">今日无事，恭喜！</p>
           </div>
         )}
       </div>
+
+      {/* 彩带动画 */}
+      {showConfetti && (
+        <div className="fixed inset-0 pointer-events-none z-50 overflow-hidden">
+          {Array.from({ length: 50 }).map((_, i) => (
+            <div
+              key={i}
+              className="confetti"
+              style={{
+                left: `${Math.random() * 100}%`,
+                backgroundColor: ['#FF527C', '#00FFFF', '#FFD700', '#FF69B4', '#00FF00', '#FF8C00'][i % 6],
+                animationDelay: `${Math.random() * 0.5}s`,
+                borderRadius: Math.random() > 0.5 ? '50%' : '0',
+                width: `${8 + Math.random() * 8}px`,
+                height: `${8 + Math.random() * 8}px`,
+              }}
+            />
+          ))}
+        </div>
+      )}
 
       {/* 夜间检查弹窗 */}
       <Modal open={showNightCheck} onClose={() => setShowNightCheck(false)}>
