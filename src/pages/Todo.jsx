@@ -3,6 +3,7 @@ import TodoItem from '../components/TodoItem'
 import Modal from '../components/Modal'
 import Button from '../components/Button'
 import BackButton from '../components/BackButton'
+import ImageWithLoader from '../components/ImageWithLoader'
 import { getTodayStr } from '../utils/date'
 
 export default function Todo({ todos, onComplete, onAddTodo, onUpdateTodo, onDeleteTodo, onDeleteUncompleted, onChangeNav }) {
@@ -225,7 +226,7 @@ export default function Todo({ todos, onComplete, onAddTodo, onUpdateTodo, onDel
 
         {todaysTodos.length === 0 && (
           <div className="text-center py-16">
-            <img src="/export (1).svg" alt="礼花" className="w-35 h-35 mx-auto mb-2 object-contain" />
+            <ImageWithLoader src="/export (1).svg" alt="礼花" className="w-35 h-35 mx-auto mb-2 object-contain" />
             <p className="text-base text-gray-400">今日无事，恭喜！</p>
           </div>
         )}

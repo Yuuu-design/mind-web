@@ -4,6 +4,7 @@ import Modal from '../components/Modal'
 import { synthesizeIdeas } from '../data/mockAI'
 import Button from '../components/Button'
 import BackButton from '../components/BackButton'
+import ImageWithLoader from '../components/ImageWithLoader'
 
 export default function Inspiration({ items, onAddInspiration, onDeleteInspirations, onArchiveInspiration, onChangeNav }) {
   const [selected, setSelected] = useState([])
@@ -136,7 +137,7 @@ export default function Inspiration({ items, onAddInspiration, onDeleteInspirati
       <div className="flex-1 overflow-y-auto no-scrollbar space-y-3 pb-4 pt-1">
         {shuffled.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20">
-            <img src={'/export (2).svg'} alt="暂无灵感" className="w-35 h-35 object-contain" />
+            <ImageWithLoader src={'/export (2).svg'} alt="暂无灵感" className="w-35 h-35 object-contain" />
           </div>
         ) : (
           shuffled.map(item => (
