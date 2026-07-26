@@ -6,8 +6,12 @@ export default function ImageWithLoader({ src, alt, className = '' }) {
   return (
     <div className="relative">
       {!loaded && (
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="w-6 h-6 border-2 border-cyan border-t-transparent rounded-full animate-spin" />
+        <div className="flex flex-col items-center justify-center py-8">
+          <div className="flex gap-1">
+            <div className="w-2 h-2 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: '0ms' }} />
+            <div className="w-2 h-2 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: '150ms' }} />
+            <div className="w-2 h-2 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: '300ms' }} />
+          </div>
         </div>
       )}
       <img
