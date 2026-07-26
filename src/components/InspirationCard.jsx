@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 
 export default function InspirationCard({ item, selected, onToggle, onDelete, onArchive }) {
   const [expanded, setExpanded] = useState(false)
@@ -76,7 +77,6 @@ export default function InspirationCard({ item, selected, onToggle, onDelete, on
       <div className="mt-3 flex items-center justify-between">
         <span className="text-[10px] text-gray-400">
           {item.time || item.date || ''}
-          {item.photos && item.photos.length > 0 && ` · ${item.photos.length}张照片`}
         </span>
 
         {/* 更多按钮 - 三个点 */}
@@ -97,7 +97,7 @@ export default function InspirationCard({ item, selected, onToggle, onDelete, on
 
           {/* 功能菜单弹出 */}
           {showMenu && (
-            <div ref={menuRef} className="absolute top-8 right-0 bg-white rounded-2xl shadow-xl p-2 w-36 animate-pop z-50">
+            <div ref={menuRef} className="absolute bottom-8 right-0 bg-white rounded-2xl shadow-xl p-2 w-36 animate-pop z-50">
               {/* 分享 */}
               <button
                 onClick={(e) => {
@@ -162,10 +162,10 @@ export default function InspirationCard({ item, selected, onToggle, onDelete, on
         </div>
       </div>
 
-      {/* 照片预览弹窗 */}
-      {previewPhoto && (
+      {/* 照片预览弹窗 - 使用 Portal 渲染到 body */}
+      {previewPhoto && createPortal(
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/70 animate-fade-in"
+          className="fixed inset-0 z-[9999] flex items-center justify-center p-6 bg-black/70 animate-fade-in"
           onClick={() => setPreviewPhoto(null)}
         >
           <img
@@ -174,7 +174,8 @@ export default function InspirationCard({ item, selected, onToggle, onDelete, on
             className="max-w-full max-h-full rounded-2xl"
             onClick={(e) => e.stopPropagation()}
           />
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   )
