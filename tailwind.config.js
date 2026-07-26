@@ -25,6 +25,9 @@ export default {
       },
       borderRadius: {
         'card': '24px'
+      },
+      spacing: {
+        '45': '11.25rem'
       }
     }
   },
