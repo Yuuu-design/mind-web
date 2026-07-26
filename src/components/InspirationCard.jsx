@@ -172,6 +172,7 @@ export default function InspirationCard({ item, selected, onToggle, onDelete, on
             src={previewPhoto.data}
             alt={previewPhoto.name}
             className="max-w-full max-h-full rounded-2xl"
+            onClick={(e) => e.stopPropagation()}
           />
         </div>
       )}
