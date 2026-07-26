@@ -14,8 +14,9 @@ export default function Inspiration({ items, onAddInspiration, onDeleteInspirati
   const [showLibrary, setShowLibrary] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [showMediaOnly, setShowMediaOnly] = useState(false)
 
-  // 随机排序 + 搜索过滤（排除已合成的灵感）
+  // 随机排序 + 搜索过滤 + 媒体筛选
   const shuffled = useMemo(() => {
     let arr = items.filter(i => !i.synthesized)
     if (searchQuery.trim()) {
@@ -25,12 +26,15 @@ export default function Inspiration({ items, onAddInspiration, onDeleteInspirati
         (i.detail && i.detail.toLowerCase().includes(query))
       )
     }
+    if (showMediaOnly) {
+      arr = arr.filter(i => i.photos && i.photos.length > 0)
+    }
     for (let i = arr.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1))
       ;[arr[i], arr[j]] = [arr[j], arr[i]]
     }
     return arr
-  }, [items, searchQuery])
+  }, [items, searchQuery, showMediaOnly])
 
   console.log('Inspiration page - items:', items, 'shuffled:', shuffled)
   console.log('Inspiration page - rendering, items length:', items.length)
@@ -120,6 +124,14 @@ export default function Inspiration({ items, onAddInspiration, onDeleteInspirati
             placeholder="搜索灵感..."
             className="flex-1 bg-transparent outline-none text-sm text-black placeholder:text-gray-400"
           />
+          <button
+            onClick={() => setShowMediaOnly(!showMediaOnly)}
+            className={`w-6 h-6 rounded-full flex items-center justify-center transition-colors ${showMediaOnly ? 'bg-cyan text-white' : 'text-gray-400 hover:bg-gray-100'}`}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/>
+            </svg>
+          </button>
           {searchQuery && (
             <button
               onClick={() => setSearchQuery('')}
