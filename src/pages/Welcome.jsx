@@ -144,7 +144,7 @@ export default function Welcome({ onAddInspiration, onGoUrgent, onGoHome }) {
   useEffect(() => {
     if (photos.length > 0 && textareaRef.current) {
       const lastPhoto = photos[photos.length - 1]
-      textareaRef.current.insertImage(lastPhoto)
+      textareaRef.current.insertMedia(lastPhoto)
     }
   }, [photos.length])
 
