@@ -87,6 +87,7 @@ export default function Todo({ todos, onComplete, onAddTodo, onUpdateTodo, onDel
         <BackButton onClick={() => onChangeNav('home')} />
         <div className="flex-1">
           <h1 className="text-2xl font-bold text-black">今日待办</h1>
+          <p className="text-xs text-gray-400 mt-1">专注今天，让重要的事慢慢完成</p>
         </div>
       </div>
 
@@ -224,8 +225,8 @@ export default function Todo({ todos, onComplete, onAddTodo, onUpdateTodo, onDel
 
         {todaysTodos.length === 0 && (
           <div className="text-center py-16">
-            <img src="/export (1).svg" alt="礼花" className="w-45 h-45 mx-auto mb-2 object-contain" />
-            <p className="text-xs text-gray-400">今日无事，恭喜！</p>
+            <img src="/export (1).svg" alt="礼花" className="w-35 h-35 mx-auto mb-2 object-contain" />
+            <p className="text-base text-gray-400">今日无事，恭喜！</p>
           </div>
         )}
       </div>

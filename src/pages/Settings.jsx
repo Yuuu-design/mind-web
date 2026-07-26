@@ -6,7 +6,10 @@ export default function Settings({
   todos,
   streak,
   onChangeNav,
-  onResetData
+  onResetData,
+  onExportData,
+  darkMode,
+  onToggleDarkMode
 }) {
   const [showArchive, setShowArchive] = useState(false)
 
@@ -52,7 +55,12 @@ export default function Settings({
         </div>
         {synthesized > 0 && (
           <div className="mt-3 pt-3 border-t border-gray-100 flex items-center gap-2">
-            <span className="text-xs text-gray-400">✨ 已合成</span>
+            <span className="text-xs text-gray-400 flex items-center gap-1">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-yellow-500">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+              </svg>
+              已合成
+            </span>
             <span className="text-xs font-bold text-black">{synthesized} 个新创意</span>
           </div>
         )}
@@ -99,13 +107,35 @@ export default function Settings({
           />
           <SettingRow
             label="数据管理"
-            desc="所有数据保存在本地"
             icon={
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>
               </svg>
             }
           />
+          <div className="flex items-center justify-between py-1">
+            <div className="flex items-center gap-2">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-500">
+                <circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+              </svg>
+              <span className="text-sm font-medium">深色模式</span>
+            </div>
+            <button
+              onClick={onToggleDarkMode}
+              className={`w-10 h-6 rounded-full relative transition-colors ${darkMode ? 'bg-cyan' : 'bg-gray-200'}`}
+            >
+              <div className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${darkMode ? 'translate-x-4' : 'translate-x-0.5'}`} />
+            </button>
+          </div>
+          <button
+            onClick={onExportData}
+            className="w-full text-left py-2 text-sm text-black font-medium flex items-center gap-2"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            导出数据
+          </button>
           <button
             onClick={onResetData}
             className="w-full text-left py-2 text-sm text-pink font-medium flex items-center gap-2"
@@ -180,7 +210,7 @@ function SettingRow({ label, desc, icon }) {
         <span className="text-gray-500">{icon}</span>
         <div>
           <div className="text-sm font-medium">{label}</div>
-          <div className="text-[10px] text-gray-400">{desc}</div>
+          {desc && <div className="text-[10px] text-gray-400">{desc}</div>}
         </div>
       </div>
       <div className="w-10 h-6 bg-gray-200 rounded-full relative">

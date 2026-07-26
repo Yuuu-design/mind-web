@@ -12,6 +12,7 @@ export default function App() {
   const [data, setData] = useState(loadData)
   const [page, setPage] = useState('welcome') // welcome 是入口
   const [activeDate, setActiveDate] = useState(null)
+  const [darkMode, setDarkMode] = useState(false)
 
   // 持久化
   useEffect(() => {
@@ -139,6 +140,22 @@ export default function App() {
     }))
   }
 
+  // 导出数据
+  const handleExportData = () => {
+    const exportData = {
+      inspirations: data.inspirations,
+      todos: data.todos,
+      exportDate: new Date().toISOString()
+    }
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `mindflow-backup-${getTodayStr()}.json`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
   // 夜间删除未完成
   const handleDeleteUncompleted = () => {
     const today = getTodayStr()
@@ -146,6 +163,11 @@ export default function App() {
       ...prev,
       todos: prev.todos.filter(t => t.date !== today || t.completed)
     }))
+  }
+
+  // 切换深色模式
+  const handleToggleDarkMode = () => {
+    setDarkMode(prev => !prev)
   }
 
   // 重置数据
@@ -225,6 +247,9 @@ export default function App() {
             streak={data.streak}
             onChangeNav={handleChangeNav}
             onResetData={handleReset}
+            onExportData={handleExportData}
+            darkMode={darkMode}
+            onToggleDarkMode={handleToggleDarkMode}
           />
         )
       default:

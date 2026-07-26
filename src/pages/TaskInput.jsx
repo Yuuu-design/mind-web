@@ -2,6 +2,19 @@ import React, { useState, useRef } from 'react'
 import Button from '../components/Button'
 import BackButton from '../components/BackButton'
 
+const taskPrompts = [
+  '今天有什么事情需要完成？',
+  '今天要处理哪些任务？',
+  '有什么待办事项？',
+  '今天的目标是什么？',
+  '需要完成哪些事情？',
+  '今天要推进什么？',
+  '有什么计划要执行？',
+  '今天的工作重点是什么？',
+  '需要解决哪些问题？',
+  '今天想要达成什么？',
+]
+
 export default function TaskInput({ onAddTodo, onBack, onGoHome }) {
   const [tasks, setTasks] = useState({
     urgent: [''],
@@ -9,6 +22,7 @@ export default function TaskInput({ onAddTodo, onBack, onGoHome }) {
   })
   const [activeType, setActiveType] = useState('urgent') // 'urgent' | 'normal'
   const [showExitConfirm, setShowExitConfirm] = useState(false)
+  const [promptText, setPromptText] = useState(taskPrompts[Math.floor(Math.random() * taskPrompts.length)])
   const inputAreaRef = useRef(null)
 
   const currentTasks = tasks[activeType]
@@ -56,18 +70,18 @@ export default function TaskInput({ onAddTodo, onBack, onGoHome }) {
             if (hasAnyContent) {
               setShowExitConfirm(true)
             } else {
-              onBack()
+              onGoHome()
             }
           }}
           className="absolute -top-4 -left-1 w-10 h-10 flex items-center justify-center text-black active:scale-95 transition-transform"
         >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M19 12H5M12 19l-7-7 7-7"/>
+            <path d="M18 6L6 18M6 6l12 12"/>
           </svg>
         </button>
         <div className="pt-8">
           <h2 className="text-2xl font-bold text-black leading-tight">
-            今天有什么事情需要完成？
+            {promptText}
           </h2>
         </div>
       </div>
@@ -114,7 +128,21 @@ export default function TaskInput({ onAddTodo, onBack, onGoHome }) {
       </div>
 
       {/* 底部 */}
-      <div className="mt-6 flex justify-end">
+      <div className="mt-6 flex items-center justify-between">
+        <button
+          onClick={() => {
+            if (hasAnyContent) {
+              setShowExitConfirm(true)
+            } else {
+              onBack()
+            }
+          }}
+          className="w-12 h-12 flex items-center justify-center text-black active:scale-95 transition-transform"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+          </svg>
+        </button>
         <Button variant="arrow" size="icon" onClick={handleNext} />
       </div>
 

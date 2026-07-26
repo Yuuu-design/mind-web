@@ -38,17 +38,20 @@ export default function InspirationCard({ item, selected, onToggle, onDelete, on
           )}
         </div>
 
-        {/* 选择标记 */}
-        <div className={`
-          w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all mt-0.5
-          ${selected ? 'bg-cyan border-cyan' : 'border-gray-300'}
-        `}>
+        {/* 选择标记 - 点击选中/取消 */}
+        <button
+          onClick={(e) => { e.stopPropagation(); onToggle(item.id) }}
+          className={`
+            w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all mt-0.5 cursor-pointer
+            ${selected ? 'bg-cyan border-cyan' : 'border-gray-300 hover:border-gray-400'}
+          `}
+        >
           {selected && (
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="black" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
               <path d="M20 6L9 17l-5-5"/>
             </svg>
           )}
-        </div>
+        </button>
       </div>
 
       {/* 展开后显示照片 */}

@@ -12,10 +12,11 @@ export default function Inspiration({ items, onAddInspiration, onDeleteInspirati
   const [editable, setEditable] = useState({ title: '', detail: '' })
   const [showLibrary, setShowLibrary] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
 
-  // 随机排序 + 搜索过滤
+  // 随机排序 + 搜索过滤（排除已合成的灵感）
   const shuffled = useMemo(() => {
-    let arr = [...items]
+    let arr = items.filter(i => !i.synthesized)
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase()
       arr = arr.filter(i =>
@@ -57,11 +58,25 @@ export default function Inspiration({ items, onAddInspiration, onDeleteInspirati
   }
 
   const handleSubmitResult = () => {
-    // 保存到 inspirations，标记为合成
-    onAddInspiration(editable.title, editable.detail, true)
+    // 保存到 inspirations，标记为合成（不跳转页面）
+    onAddInspiration(editable.title, editable.detail, [], true)
     setResult(null)
     setEditable({ title: '', detail: '' })
+    // 弹出确认是否删除选中的灵感
+    setShowDeleteConfirm(true)
+  }
+
+  // 确认删除选中的灵感
+  const handleConfirmDelete = () => {
+    onDeleteInspirations(selected)
     setSelected([])
+    setShowDeleteConfirm(false)
+  }
+
+  // 取消删除，保留灵感
+  const handleCancelDelete = () => {
+    setSelected([])
+    setShowDeleteConfirm(false)
   }
 
   const handleCancel = () => {
@@ -77,7 +92,7 @@ export default function Inspiration({ items, onAddInspiration, onDeleteInspirati
   }
 
   return (
-    <div className="h-full flex flex-col px-6 pt-14 pb-8 border-4 border-red-500">
+    <div className="h-full flex flex-col px-6 pt-14 pb-8">
       {/* 顶部 */}
       <div className="flex items-center gap-4 mb-5">
         <BackButton onClick={() => onChangeNav('home')} />
@@ -118,10 +133,10 @@ export default function Inspiration({ items, onAddInspiration, onDeleteInspirati
       </div>
 
       {/* 灵感卡片列表 - 随机分布 */}
-      <div className="flex-1 overflow-y-auto no-scrollbar space-y-3 pb-4">
+      <div className="flex-1 overflow-y-auto no-scrollbar space-y-3 pb-4 pt-1">
         {shuffled.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20">
-            <img src={'/export (2).svg'} alt="暂无灵感" className="w-45 h-45 object-contain" />
+            <img src={'/export (2).svg'} alt="暂无灵感" className="w-35 h-35 object-contain" />
           </div>
         ) : (
           shuffled.map(item => (
@@ -221,6 +236,30 @@ export default function Inspiration({ items, onAddInspiration, onDeleteInspirati
           关闭
         </button>
       </Modal>
+
+      {/* 删除确认弹窗 */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-6">
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={handleCancelDelete} />
+          <div className="relative bg-white rounded-card p-6 w-full max-w-sm shadow-2xl animate-pop">
+            <p className="text-base text-black text-center mb-5">是否删除之前选中的灵感？</p>
+            <div className="flex gap-3">
+              <button
+                onClick={handleCancelDelete}
+                className="flex-1 py-2.5 rounded-full border border-gray-200 text-sm font-medium text-gray-600"
+              >
+                保留
+              </button>
+              <button
+                onClick={handleConfirmDelete}
+                className="flex-1 py-2.5 rounded-full bg-pink text-white text-sm font-medium"
+              >
+                删除
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   )

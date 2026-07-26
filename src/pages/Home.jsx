@@ -15,6 +15,7 @@ export default function Home({
   const [year, setYear] = useState(now.getFullYear())
   const [month, setMonth] = useState(now.getMonth() + 1)
   const [showPicker, setShowPicker] = useState(false)
+  const [selectedInspiration, setSelectedInspiration] = useState(null)
 
   const handleSelectDate = (d) => {
     onSelectDate(d)
@@ -119,8 +120,79 @@ export default function Home({
         />
       </Modal>
 
+      {/* 最近留下的灵感 */}
+      {inspirations.length > 0 && (
+        <div className="mb-20">
+          <h3 className="text-sm font-bold text-black mb-3">最近留下</h3>
+          <div className="space-y-4">
+            {inspirations.slice(0, 3).map((item, idx) => {
+              const dateStr = item.date ? `${item.date.split('-')[1]}月${item.date.split('-')[2]}号` : '今天'
+              const titles = ['灵光一现', '灵感碎片', '思维火花', '创意瞬间', '脑海闪光']
+              const icons = [
+                <svg key="1" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7c.6.4 1 1 1 1.7V18h6v-1.6c0-.7.4-1.3 1-1.7A7 7 0 0 0 12 2z"/></svg>,
+                <svg key="2" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>,
+                <svg key="3" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>,
+                <svg key="4" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>,
+                <svg key="5" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8"/></svg>,
+              ]
+              return (
+                <div
+                  key={item.id}
+                  onClick={() => setSelectedInspiration(item)}
+                  className="bg-white rounded-2xl p-5 shadow-sm flex items-start gap-3 cursor-pointer active:scale-[0.98] transition-transform"
+                >
+                  <span className="text-pink mt-0.5">{icons[idx % icons.length]}</span>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm text-pink font-semibold mb-2">
+                      {dateStr} · {titles[idx % titles.length]}
+                    </p>
+                    <p className="text-xs text-gray-500 truncate">{item.title}</p>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
+
       {/* 底部导航：灵感 ＋ 待办 */}
       <BottomNav active="plus" onChange={onChangeNav} />
+
+      {/* 灵感详情弹窗 */}
+      <Modal open={!!selectedInspiration} onClose={() => setSelectedInspiration(null)}>
+        {selectedInspiration && (
+          <div>
+            <p className="text-xs text-cyan font-medium mb-2">
+              {selectedInspiration.date && `${selectedInspiration.date.split('-')[1]}月${selectedInspiration.date.split('-')[2]}号`}
+            </p>
+            <h3 className="text-lg font-bold text-black mb-3">{selectedInspiration.title}</h3>
+            {selectedInspiration.detail && (
+              <p className="text-sm text-gray-500 leading-relaxed mb-4">{selectedInspiration.detail}</p>
+            )}
+            {selectedInspiration.photos && selectedInspiration.photos.length > 0 && (
+              <div className="flex gap-2 flex-wrap mb-4">
+                {selectedInspiration.photos.map(p => (
+                  <div key={p.id} className="w-16 h-16 rounded-xl overflow-hidden bg-gray-100">
+                    {p.type === 'image' || p.type === 'camera' ? (
+                      <img src={p.data} alt={p.name} className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-gray-400">
+                        {p.type === 'video' ? '🎬' : '🎵'}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+            <button
+              onClick={() => setSelectedInspiration(null)}
+              className="w-full bg-black text-white rounded-full py-2 text-sm font-medium"
+            >
+              关闭
+            </button>
+          </div>
+        )}
+      </Modal>
     </div>
   )
 }

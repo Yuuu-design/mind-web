@@ -2,12 +2,31 @@ import React, { useState, useRef, useEffect } from 'react'
 import Button from '../components/Button'
 import InputBox from '../components/InputBox'
 
+const promptTexts = [
+  '今天有什么灵感迸发？',
+  '此刻在想什么？',
+  '有什么新奇的想法？',
+  '脑海中出现什么画面？',
+  '今天发现了什么有趣的事？',
+  '有什么想要记录下来的？',
+  '灵感来了就抓住它',
+  '让想法自由流动',
+  '每一个碎片都有意义',
+  '今天想探索什么？',
+  '有什么创意想要分享？',
+  '记录下此刻的心情',
+  '今天有什么新的发现？',
+  '想要写下什么故事？',
+  '让创意在此刻绽放',
+]
+
 export default function Welcome({ onAddInspiration, onGoUrgent, onGoHome }) {
   const [value, setValue] = useState('')
   const [photos, setPhotos] = useState([])
   const [showMenu, setShowMenu] = useState(false)
   const [showExitConfirm, setShowExitConfirm] = useState(false)
   const [showSuccess, setShowSuccess] = useState(false)
+  const [promptText, setPromptText] = useState(promptTexts[Math.floor(Math.random() * promptTexts.length)])
   const menuRef = useRef(null)
   const inputAreaRef = useRef(null)
   const textareaRef = useRef(null)
@@ -127,7 +146,10 @@ export default function Welcome({ onAddInspiration, onGoUrgent, onGoHome }) {
     setPhotos([])
     setValue('')
     setShowSuccess(true)
-    setTimeout(() => setShowSuccess(false), 2000)
+    setTimeout(() => {
+      setShowSuccess(false)
+      onGoUrgent()
+    }, 500)
   }
 
   // 功能菜单项
@@ -235,14 +257,14 @@ export default function Welcome({ onAddInspiration, onGoUrgent, onGoHome }) {
             Hey，Rainey
           </h1>
           <p className="text-xl text-gray-500 mt-2 leading-snug">
-            今天有什么灵感迸发？
+            {promptText}
           </p>
         </div>
       </div>
 
       {/* 成功提示 */}
       {showSuccess && (
-        <div className="absolute top-16 left-1/2 -translate-x-1/2 z-50 animate-fade-in">
+        <div className="fixed inset-0 flex items-center justify-center z-50 animate-fade-in">
           <div className="bg-black text-white px-4 py-2 rounded-full text-sm font-medium flex items-center gap-2 shadow-lg">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M20 6L9 17l-5-5"/>
@@ -393,9 +415,14 @@ export default function Welcome({ onAddInspiration, onGoUrgent, onGoHome }) {
       {/* 底部按钮（有输入时显示提交） */}
       {hasInput && (
         <div className="mt-4 flex items-center justify-end">
-          <Button variant="primary" size="md" onClick={handleSubmit}>
-            提交
-          </Button>
+          <button
+            onClick={handleSubmit}
+            className="w-12 h-12 rounded-full bg-black text-white flex items-center justify-center active:scale-95 transition-transform shadow-md"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M7 17L17 7M17 7H7M17 7v10"/>
+            </svg>
+          </button>
         </div>
       )}
 
