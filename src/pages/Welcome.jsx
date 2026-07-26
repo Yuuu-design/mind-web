@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react'
 import Button from '../components/Button'
-import InputBox from '../components/InputBox'
+import InlineInput from '../components/InlineInput'
 
 const promptTexts = [
   '今天有什么灵感迸发？',
@@ -140,6 +140,14 @@ export default function Welcome({ onAddInspiration, onGoUrgent, onGoHome }) {
     setPhotos(prev => prev.filter(p => p.id !== id))
   }
 
+  // 当有新照片时，插入到输入框中
+  useEffect(() => {
+    if (photos.length > 0 && textareaRef.current) {
+      const lastPhoto = photos[photos.length - 1]
+      textareaRef.current.insertImage(lastPhoto)
+    }
+  }, [photos.length])
+
   const handleSubmit = () => {
     if (!hasInput) return
     onAddInspiration(value.trim(), '', photos)
@@ -277,108 +285,68 @@ export default function Welcome({ onAddInspiration, onGoUrgent, onGoHome }) {
       {/* 中间输入区 */}
       <div className="flex-1 flex flex-col">
         <div ref={inputAreaRef} className="bg-white rounded-card p-5 shadow-sm flex-1 min-h-[200px] relative">
-          <InputBox
+          <InlineInput
             ref={textareaRef}
             value={value}
             onChange={setValue}
             placeholder="想到什么，随手记下来..."
-            autoFocus={true}
-            multiline={true}
+            photos={photos}
+            onRemovePhoto={handleRemovePhoto}
             className="h-full"
           />
 
-          {/* 已选文件预览 */}
-          {photos.length > 0 && (
-            <div className="mt-3 flex gap-2 flex-wrap animate-fade-in">
-              {photos.map(p => (
-                <div key={p.id} className="relative w-16 h-16 rounded-xl overflow-hidden bg-gray-100">
-                  {p.type === 'image' || p.type === 'camera' ? (
-                    <img src={p.data} alt={p.name} className="w-full h-full object-cover" />
-                  ) : p.type === 'video' ? (
-                    <div className="w-full h-full flex items-center justify-center bg-black/5">
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-pink">
-                        <polygon points="23 7 16 12 23 17 23 7"/>
-                        <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
-                      </svg>
-                    </div>
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-black/5">
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-cyan">
-                        <path d="M9 18V5l12-2v13"/>
-                        <circle cx="6" cy="18" r="3"/>
-                        <circle cx="18" cy="16" r="3"/>
-                      </svg>
-                    </div>
-                  )}
-                  <button
-                    onClick={() => handleRemovePhoto(p.id)}
-                    className="absolute top-0.5 right-0.5 w-4 h-4 rounded-full bg-black/50 flex items-center justify-center"
-                  >
-                    <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M18 6L6 18M6 6l12 12"/>
-                    </svg>
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
+          {/* 底部工具栏 - 卡片内 */}
+          <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between">
+            {/* 左侧：加号 + 时钟 */}
+            <div className="flex items-center gap-2">
+              {/* 加号按钮 */}
+              <div className="relative">
+                <button
+                  onClick={() => setShowMenu(!showMenu)}
+                  className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${
+                    showMenu ? 'bg-black text-white rotate-45' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+                  }`}
+                >
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12 5v14M5 12h14"/>
+                  </svg>
+                </button>
 
-          {/* 输入框内的工具栏 */}
-          <div className="absolute bottom-3 right-3 flex items-center gap-2">
-            {/* 加号按钮 - 在输入框内 */}
-            <div className="relative">
+                {/* 功能菜单弹出 */}
+                {showMenu && (
+                  <div ref={menuRef} className="absolute bottom-12 left-0 bg-white rounded-2xl shadow-xl p-2 w-44 animate-pop z-50">
+                    {menuItems.map((item, idx) => (
+                      <button
+                        key={idx}
+                        onClick={item.onClick}
+                        className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-gray-50 active:bg-gray-100 transition-colors"
+                      >
+                        <div className={`w-8 h-8 ${item.color} rounded-full flex items-center justify-center text-white`}>
+                          {item.icon}
+                        </div>
+                        <span className="text-sm text-black font-medium">{item.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* 时钟按钮 */}
               <button
-                onClick={() => setShowMenu(!showMenu)}
-                className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${
-                  showMenu ? 'bg-black text-white rotate-45' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
-                }`}
+                onClick={handleInsertTime}
+                className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 hover:bg-gray-200 transition-all"
+                title="插入时间"
               >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M12 5v14M5 12h14"/>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10"/>
+                  <polyline points="12 6 12 12 16 14"/>
                 </svg>
               </button>
-
-              {/* 功能菜单弹出 */}
-              {showMenu && (
-                <div ref={menuRef} className="absolute bottom-10 right-0 bg-white rounded-2xl shadow-xl p-2 w-44 animate-pop z-50">
-                  {menuItems.map((item, idx) => (
-                    <button
-                      key={idx}
-                      onClick={item.onClick}
-                      className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-gray-50 active:bg-gray-100 transition-colors"
-                    >
-                      <div className={`w-8 h-8 ${item.color} rounded-full flex items-center justify-center text-white`}>
-                        {item.icon}
-                      </div>
-                      <span className="text-sm text-black font-medium">{item.label}</span>
-                    </button>
-                  ))}
-                </div>
-              )}
             </div>
 
-            {/* 时钟按钮 */}
-            <button
-              onClick={handleInsertTime}
-              className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 hover:bg-gray-200 transition-all"
-              title="插入时间"
-            >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="10"/>
-                <polyline points="12 6 12 12 16 14"/>
-              </svg>
-            </button>
-
-            {/* 箭头（无输入时） */}
+            {/* 右侧：箭头（无输入时） */}
             {!hasInput && (
-              <button
-                onClick={onGoUrgent}
-                className="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center active:scale-95 transition-transform"
-              >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M5 12h14M12 5l7 7-7 7"/>
-                </svg>
-              </button>
+              <Button variant="arrow" size="icon" onClick={onGoUrgent} />
             )}
           </div>
 
