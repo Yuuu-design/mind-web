@@ -31,6 +31,7 @@ export default function Inspiration({ items, onAddInspiration, onDeleteInspirati
   }, [items, searchQuery])
 
   console.log('Inspiration page - items:', items, 'shuffled:', shuffled)
+  console.log('Inspiration page - rendering, items length:', items.length)
 
   // 合成库
   const synthesizedItems = useMemo(() => {
@@ -76,7 +77,7 @@ export default function Inspiration({ items, onAddInspiration, onDeleteInspirati
   }
 
   return (
-    <div className="h-full flex flex-col px-6 pt-14 pb-8 animate-fade-in">
+    <div className="h-full flex flex-col px-6 pt-14 pb-8 border-4 border-red-500">
       {/* 顶部 */}
       <div className="flex items-center gap-4 mb-5">
         <BackButton onClick={() => onChangeNav('home')} />

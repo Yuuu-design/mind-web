@@ -58,6 +58,30 @@ export default function App() {
     }
   }
 
+  // 添加灵感（不跳转页面）
+  const handleAddInspirationStay = (title, detail = '', photos = []) => {
+    const now = new Date()
+    const year = now.getFullYear()
+    const month = now.getMonth() + 1
+    const day = now.getDate()
+    const hours = String(now.getHours()).padStart(2, '0')
+    const minutes = String(now.getMinutes()).padStart(2, '0')
+    const seconds = String(now.getSeconds()).padStart(2, '0')
+    const newItem = {
+      id: Date.now() + Math.random(),
+      title,
+      detail,
+      photos,
+      date: getTodayStr(),
+      time: `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`,
+      synthesized: false
+    }
+    setData(prev => ({
+      ...prev,
+      inspirations: [newItem, ...prev.inspirations]
+    }))
+  }
+
   // 添加待办
   const handleAddTodo = (text, type = 'urgent') => {
     const newItem = {
@@ -134,6 +158,7 @@ export default function App() {
 
   // 导航
   const handleChangeNav = (key) => {
+    console.log('handleChangeNav called with key:', key)
     if (key === 'plus') {
       setPage('welcome')
     } else {
@@ -147,7 +172,7 @@ export default function App() {
       case 'welcome':
         return (
           <Welcome
-            onAddInspiration={handleAddInspiration}
+            onAddInspiration={handleAddInspirationStay}
             onGoUrgent={() => setPage('urgent')}
             onGoHome={() => setPage('home')}
           />
