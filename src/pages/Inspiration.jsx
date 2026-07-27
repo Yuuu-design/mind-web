@@ -67,21 +67,6 @@ export default function Inspiration({ items, onAddInspiration, onDeleteInspirati
     onAddInspiration(editable.title, editable.detail, [], true)
     setResult(null)
     setEditable({ title: '', detail: '' })
-    // 弹出确认是否删除选中的灵感
-    setShowDeleteConfirm(true)
-  }
-
-  // 确认删除选中的灵感
-  const handleConfirmDelete = () => {
-    onDeleteInspirations(selected)
-    setSelected([])
-    setShowDeleteConfirm(false)
-  }
-
-  // 取消删除，保留灵感
-  const handleCancelDelete = () => {
-    setSelected([])
-    setShowDeleteConfirm(false)
   }
 
   const handleCancel = () => {
@@ -89,11 +74,22 @@ export default function Inspiration({ items, onAddInspiration, onDeleteInspirati
     setEditable({ title: '', detail: '' })
   }
 
-  // 删除选中的灵感（移入归档）
+  // 删除选中的灵感 - 显示确认弹窗
   const handleDeleteSelected = () => {
     if (selected.length === 0) return
+    setShowDeleteConfirm(true)
+  }
+
+  // 确认删除
+  const handleConfirmDelete = () => {
     onDeleteInspirations(selected)
     setSelected([])
+    setShowDeleteConfirm(false)
+  }
+
+  // 取消删除
+  const handleCancelDelete = () => {
+    setShowDeleteConfirm(false)
   }
 
   return (
