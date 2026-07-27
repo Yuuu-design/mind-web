@@ -4,11 +4,13 @@ const InlineInput = forwardRef(function InlineInput({ value, onChange, placehold
   const editorRef = useRef(null)
   const [isEmpty, setIsEmpty] = useState(true)
 
+  // 同步 value 到输入框（用于时间插入等外部修改）
   useEffect(() => {
     if (editorRef.current && editorRef.current.innerText !== value) {
       editorRef.current.innerText = value
+      setIsEmpty(value.trim().length === 0)
     }
-  }, [])
+  }, [value])
 
   const handleInput = () => {
     const text = editorRef.current?.innerText || ''

@@ -1,0 +1,8 @@
+<WebsiteConfiguration>
+  <IndexDocument>
+    <Suffix>index.html</Suffix>
+  </IndexDocument>
+  <ErrorDocument>
+    <Key>index.html</Key>
+  </ErrorDocument>
+</WebsiteConfiguration>
