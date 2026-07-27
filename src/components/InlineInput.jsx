@@ -74,13 +74,19 @@ const InlineInput = forwardRef(function InlineInput({ value, onChange, placehold
 
     container.contentEditable = false
 
+    // 聚焦编辑器并将光标移到末尾
+    editorRef.current.focus()
+    const range = document.createRange()
+    range.selectNodeContents(editorRef.current)
+    range.collapse(false) // 光标移到末尾
     const selection = window.getSelection()
-    if (selection.rangeCount > 0) {
-      const range = selection.getRangeAt(0)
-      range.insertNode(container)
-      range.collapse(false)
-      handleInput()
-    }
+    selection.removeAllRanges()
+    selection.addRange(range)
+
+    // 插入图片
+    range.insertNode(container)
+    range.collapse(false)
+    handleInput()
   }
 
   useEffect(() => {
