@@ -97,7 +97,7 @@ export default function InspirationCard({ item, selected, onToggle, onDelete, on
 
           {/* 功能菜单弹出 */}
           {showMenu && (
-            <div ref={menuRef} className="absolute bottom-8 right-0 bg-white rounded-2xl shadow-xl p-2 w-36 animate-pop z-50">
+            <div ref={menuRef} className="absolute -top-2 right-0 bg-white rounded-2xl shadow-xl p-2 w-36 animate-pop z-50" style={{ transform: 'translateY(-100%)' }}>
               {/* 分享 */}
               <button
                 onClick={(e) => {
