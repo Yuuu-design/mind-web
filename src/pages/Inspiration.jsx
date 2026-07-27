@@ -281,7 +281,7 @@ export default function Inspiration({ items, onAddInspiration, onDeleteInspirati
       {/* 底部添加按钮 */}
       <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-40">
         <button
-          onClick={() => onChangeNav('welcome')}
+          onClick={() => onChangeNav('welcome?from=inspiration')}
           className="w-14 h-14 rounded-full bg-cyan text-black shadow-lg flex items-center justify-center active:scale-95 transition-transform"
         >
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">

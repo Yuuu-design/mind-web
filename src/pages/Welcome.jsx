@@ -20,7 +20,7 @@ const promptTexts = [
   '让创意在此刻绽放',
 ]
 
-export default function Welcome({ onAddInspiration, onGoUrgent, onGoHome }) {
+export default function Welcome({ onAddInspiration, onGoUrgent, onGoHome, fromInspiration = false }) {
   const [value, setValue] = useState('')
   const [photos, setPhotos] = useState([])
   const [showMenu, setShowMenu] = useState(false)
@@ -156,7 +156,10 @@ export default function Welcome({ onAddInspiration, onGoUrgent, onGoHome }) {
     setShowSuccess(true)
     setTimeout(() => {
       setShowSuccess(false)
-      onGoUrgent()
+      // 从灵感页面进入时停留，从首页进入时跳转到待办页
+      if (!fromInspiration) {
+        onGoUrgent()
+      }
     }, 500)
   }
 

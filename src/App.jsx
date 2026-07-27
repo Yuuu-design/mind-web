@@ -190,13 +190,19 @@ export default function App() {
 
   // 渲染当前页面
   const renderPage = () => {
-    switch (page) {
+    // 解析 page 中的查询参数
+    const [currentPage, queryString] = page.split('?')
+    const params = new URLSearchParams(queryString || '')
+    const fromInspiration = params.get('from') === 'inspiration'
+
+    switch (currentPage) {
       case 'welcome':
         return (
           <Welcome
             onAddInspiration={handleAddInspirationStay}
             onGoUrgent={() => setPage('urgent')}
             onGoHome={() => setPage('home')}
+            fromInspiration={fromInspiration}
           />
         )
       case 'urgent':
