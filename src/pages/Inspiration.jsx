@@ -262,7 +262,8 @@ export default function Inspiration({ items, onAddInspiration, onDeleteInspirati
         <div className="fixed inset-0 z-50 flex items-center justify-center p-6">
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={handleCancelDelete} />
           <div className="relative bg-white rounded-card p-6 w-full max-w-sm shadow-2xl animate-pop">
-            <p className="text-base text-black text-center mb-5">是否删除之前选中的灵感？</p>
+            <p className="text-base text-black text-center mb-2">是否删除之前选中的灵感？</p>
+            <p className="text-sm text-pink text-center mb-5">删除后将无法找回</p>
             <div className="flex gap-3">
               <button
                 onClick={handleCancelDelete}
