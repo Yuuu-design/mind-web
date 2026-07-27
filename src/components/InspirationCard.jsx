@@ -5,6 +5,7 @@ export default function InspirationCard({ item, selected, onToggle, onDelete, on
   const [expanded, setExpanded] = useState(false)
   const [previewPhoto, setPreviewPhoto] = useState(null)
   const [showMenu, setShowMenu] = useState(false)
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
   const menuRef = useRef(null)
 
   // 点击空白处关闭菜单
@@ -148,7 +149,7 @@ export default function InspirationCard({ item, selected, onToggle, onDelete, on
                 onClick={(e) => {
                   e.stopPropagation()
                   setShowMenu(false)
-                  onDelete(item.id)
+                  setShowDeleteDialog(true)
                 }}
                 className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-gray-50 transition-colors"
               >
@@ -174,6 +175,37 @@ export default function InspirationCard({ item, selected, onToggle, onDelete, on
             className="max-w-full max-h-full rounded-2xl"
             onClick={(e) => e.stopPropagation()}
           />
+        </div>,
+        document.body
+      )}
+
+      {/* 删除确认弹窗 */}
+      {showDeleteDialog && createPortal(
+        <div
+          className="fixed inset-0 z-[9999] flex items-center justify-center p-6 bg-black/40 backdrop-blur-sm animate-fade-in"
+          onClick={() => setShowDeleteDialog(false)}
+        >
+          <div className="relative bg-white rounded-card p-6 w-full max-w-sm shadow-2xl animate-pop" onClick={(e) => e.stopPropagation()}>
+            <p className="text-base text-black text-center mb-2">是否删除这条灵感？</p>
+            <p className="text-sm text-pink text-center mb-5">删除后将无法找回</p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowDeleteDialog(false)}
+                className="flex-1 py-2.5 rounded-full border border-gray-200 text-sm font-medium text-gray-600"
+              >
+                保留
+              </button>
+              <button
+                onClick={() => {
+                  setShowDeleteDialog(false)
+                  onDelete(item.id)
+                }}
+                className="flex-1 py-2.5 rounded-full bg-pink text-white text-sm font-medium"
+              >
+                删除
+              </button>
+            </div>
+          </div>
         </div>,
         document.body
       )}
