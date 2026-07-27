@@ -7,6 +7,7 @@ import Todo from './pages/Todo'
 import Settings from './pages/Settings'
 import { loadData, saveData } from './utils/storage'
 import { getTodayStr } from './utils/date'
+import { GlobalLoading } from './components/Loading'
 
 export default function App() {
   const [data, setData] = useState(loadData)

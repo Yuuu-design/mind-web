@@ -57,9 +57,13 @@ export default function Welcome({ onAddInspiration, onGoUrgent, onGoHome, fromIn
   const audioInputRef = useRef(null)
   const hasInput = value.trim().length > 0 || photos.length > 0
 
+  const [isUploading, setIsUploading] = useState(false)
+
   // 处理文件选择（相册）
   const handlePhotoSelect = (e) => {
     const files = Array.from(e.target.files)
+    setIsUploading(true)
+    let processed = 0
     files.forEach(file => {
       if (file.type.startsWith('image/')) {
         const reader = new FileReader()
@@ -70,12 +74,15 @@ export default function Welcome({ onAddInspiration, onGoUrgent, onGoHome, fromIn
             name: file.name,
             type: 'image'
           }])
+          processed++
+          if (processed === files.length) setIsUploading(false)
         }
         reader.readAsDataURL(file)
       }
     })
     e.target.value = ''
     setShowMenu(false)
+    if (files.length === 0) setIsUploading(false)
   }
 
   // 处理拍照
@@ -346,6 +353,14 @@ export default function Welcome({ onAddInspiration, onGoUrgent, onGoHome, fromIn
                 </svg>
               </button>
             </div>
+
+            {/* 上传加载提示 */}
+            {isUploading && (
+              <div className="absolute bottom-16 left-4 flex items-center gap-2 text-sm text-gray-500 animate-fade-in">
+                <div className="w-4 h-4 border-2 border-cyan border-t-transparent rounded-full animate-spin" />
+                <span>上传中...</span>
+              </div>
+            )}
 
             {/* 右侧：箭头（无输入时） */}
             {!hasInput && (
