@@ -18,6 +18,13 @@ const InlineInput = forwardRef(function InlineInput({ value, onChange, placehold
     setIsEmpty(text.trim().length === 0)
   }
 
+  // 处理粘贴事件 - 只保留纯文本
+  const handlePaste = (e) => {
+    e.preventDefault()
+    const text = e.clipboardData.getData('text/plain')
+    document.execCommand('insertText', false, text)
+  }
+
   const handleKeyDown = (e) => {
     if (e.key === 'Backspace') {
       const selection = window.getSelection()
@@ -106,6 +113,7 @@ const InlineInput = forwardRef(function InlineInput({ value, onChange, placehold
         contentEditable
         onInput={handleInput}
         onKeyDown={handleKeyDown}
+        onPaste={handlePaste}
         data-placeholder={placeholder}
         className="w-full min-h-[120px] outline-none text-base text-black leading-relaxed break-words [&:empty]:before:content-[attr(data-placeholder)] [&:empty]:before:text-gray-400"
       />
