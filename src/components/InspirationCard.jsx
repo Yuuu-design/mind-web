@@ -26,25 +26,27 @@ export default function InspirationCard({ item, selected, onToggle, onDelete, on
         ${selected ? 'ring-2 ring-cyan shadow-lg' : 'hover:shadow-md'}
       `}
     >
-      {/* 卡片主体 - 点击选中/取消 */}
-      <div onClick={() => onToggle(item.id)} className="flex items-start justify-between gap-3">
-        <div className="flex-1 min-w-0">
+      {/* 卡片主体 */}
+      <div className="flex items-start justify-between gap-3">
+        {/* 标题区域 - 点击展开/收起 */}
+        <div className="flex-1 min-w-0 cursor-pointer" onClick={() => setExpanded(!expanded)}>
           <h3 className="font-semibold text-black text-base leading-snug">
             {item.title}
           </h3>
-          {/* 显示详细内容 */}
-          {item.detail && (
-            <p className="mt-2 text-sm text-gray-500 leading-relaxed">
+          {/* 展开后显示详细内容 */}
+          {expanded && item.detail && (
+            <p className="mt-2 text-sm text-gray-500 leading-relaxed animate-fade-in">
               {item.detail}
             </p>
           )}
         </div>
 
-        {/* 选择标记 */}
-        <div
+        {/* 选择标记 - 点击选中/取消 */}
+        <button
+          onClick={(e) => { e.stopPropagation(); onToggle(item.id) }}
           className={`
-            w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all mt-0.5
-            ${selected ? 'bg-cyan border-cyan' : 'border-gray-300'}
+            w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all mt-0.5 cursor-pointer
+            ${selected ? 'bg-cyan border-cyan' : 'border-gray-300 hover:border-gray-400'}
           `}
         >
           {selected && (
@@ -52,7 +54,7 @@ export default function InspirationCard({ item, selected, onToggle, onDelete, on
               <path d="M20 6L9 17l-5-5"/>
             </svg>
           )}
-        </div>
+        </button>
       </div>
 
       {/* 展开后显示照片 */}
