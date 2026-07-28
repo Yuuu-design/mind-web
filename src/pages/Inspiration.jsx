@@ -204,18 +204,19 @@ export default function Inspiration({ items, onAddInspiration, onDeleteInspirati
         {result && (
           <div>
             <h3 className="text-lg font-bold mb-3">灵感合成结果</h3>
-            <div className="bg-cyan/10 rounded-2xl p-4 mb-4 space-y-3">
+            <p className="text-xs text-gray-400 mb-3">✏️ 点击文字即可编辑</p>
+            <div className="bg-cyan/10 rounded-2xl p-4 mb-4 space-y-3 border-2 border-dashed border-cyan/30">
               <input
                 value={editable.title}
                 onChange={(e) => setEditable(prev => ({ ...prev, title: e.target.value }))}
-                className="w-full bg-transparent font-semibold text-base outline-none border-b border-cyan/30 pb-2"
-                placeholder="标题"
+                className="w-full bg-transparent font-semibold text-base outline-none border-b border-cyan/30 pb-2 hover:border-cyan focus:border-cyan transition-colors"
+                placeholder="点击编辑标题..."
               />
               <textarea
                 value={editable.detail}
                 onChange={(e) => setEditable(prev => ({ ...prev, detail: e.target.value }))}
-                className="w-full bg-transparent text-sm text-gray-600 leading-relaxed outline-none resize-none min-h-[80px]"
-                placeholder="详细内容"
+                className="w-full bg-transparent text-sm text-gray-600 leading-relaxed outline-none resize-none min-h-[80px] hover:bg-white/50 focus:bg-white/50 rounded p-1 transition-colors"
+                placeholder="点击编辑详细内容..."
               />
             </div>
             <div className="flex gap-3">
