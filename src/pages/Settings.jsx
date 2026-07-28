@@ -12,6 +12,11 @@ export default function Settings({
   onToggleDarkMode
 }) {
   const [showArchive, setShowArchive] = useState(false)
+  const [nightReminder, setNightReminder] = useState(false)
+
+  const handleToggleNightReminder = () => {
+    setNightReminder(prev => !prev)
+  }
 
   // 统计数据
   const totalInsp = inspirations.filter(i => !i.archived).length
@@ -96,15 +101,26 @@ export default function Settings({
           基本设置
         </h3>
         <div className="space-y-3">
-          <SettingRow
-            label="夜间提醒"
-            desc="22:00 检查未完成事项"
-            icon={
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <div className="flex items-center justify-between py-1">
+            <div className="flex items-center gap-2">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-500">
                 <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
               </svg>
-            }
-          />
+              <div>
+                <div className="text-sm font-medium">夜间提醒</div>
+                <div className="text-[10px] text-gray-400">22:00 检查未完成事项</div>
+              </div>
+            </div>
+            <button
+              onClick={(e) => {
+                e.stopPropagation()
+                handleToggleNightReminder()
+              }}
+              className={`w-10 h-6 rounded-full relative transition-colors ${nightReminder ? 'bg-cyan' : 'bg-gray-200'}`}
+            >
+              <div className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${nightReminder ? 'translate-x-4' : 'translate-x-0.5'}`} />
+            </button>
+          </div>
           <SettingRow
             label="数据管理"
             icon={
