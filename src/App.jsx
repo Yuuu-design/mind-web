@@ -265,8 +265,10 @@ export default function App() {
   }
 
   return (
-    <div className="h-full w-full overflow-hidden">
-      {renderPage()}
+    <div className="h-full w-full overflow-hidden relative">
+      <div key={page} className="h-full w-full animate-page-enter">
+        {renderPage()}
+      </div>
     </div>
   )
 }
