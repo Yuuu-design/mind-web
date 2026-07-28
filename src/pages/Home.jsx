@@ -126,7 +126,21 @@ export default function Home({
           <h3 className="text-sm font-bold text-black mb-3">最近留下</h3>
           <div className="space-y-4">
             {inspirations.slice(0, 3).map((item, idx) => {
-              const dateStr = item.date ? `${item.date.split('-')[1]}月${item.date.split('-')[2]}号` : '今天'
+              const relativeTime = item.time ? (() => {
+                const [year, month, day, hour, minute] = item.time.match(/(\d+)-(\d+)-(\d+) (\d+):(\d+)/)?.slice(1) || []
+                if (!hour) return item.date || '今天'
+                const now = new Date()
+                const itemDate = new Date(Number(year), Number(month) - 1, Number(day), Number(hour), Number(minute))
+                const diffMs = now.getTime() - itemDate.getTime()
+                const diffMins = Math.floor(diffMs / 60000)
+                const diffHours = Math.floor(diffMins / 60)
+                const diffDays = Math.floor(diffHours / 24)
+                if (diffMins < 1) return '刚刚'
+                if (diffMins < 60) return `${diffMins}分钟前`
+                if (diffHours < 24) return `${diffHours}小时前`
+                if (diffDays < 7) return `${diffDays}天前`
+                return item.date || '今天'
+              })() : item.date || '今天'
               const titles = ['灵光一现', '灵感碎片', '思维火花', '创意瞬间', '脑海闪光']
               const icons = [
                 <svg key="1" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7c.6.4 1 1 1 1.7V18h6v-1.6c0-.7.4-1.3 1-1.7A7 7 0 0 0 12 2z"/></svg>,
@@ -135,17 +149,31 @@ export default function Home({
                 <svg key="4" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>,
                 <svg key="5" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8"/></svg>,
               ]
+              const hasPhotos = item.photos && item.photos.length > 0
               return (
                 <div
                   key={item.id}
-                  onClick={() => setSelectedInspiration(item)}
-                  className="bg-white rounded-2xl p-5 shadow-sm flex items-start gap-3 cursor-pointer active:scale-[0.98] transition-transform"
+                  onClick={() => {
+                    setSelectedInspiration(item)
+                    onChangeNav('inspiration')
+                  }}
+                  className="bg-white rounded-2xl p-5 shadow-sm flex items-start gap-3 cursor-pointer active:scale-[0.98] transition-transform hover:shadow-md"
                 >
                   <span className="text-pink mt-0.5">{icons[idx % icons.length]}</span>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm text-pink font-semibold mb-2">
-                      {dateStr} · {titles[idx % titles.length]}
-                    </p>
+                    <div className="flex items-center gap-2 mb-1">
+                      <p className="text-sm text-pink font-semibold">
+                        {relativeTime} · {titles[idx % titles.length]}
+                      </p>
+                      {hasPhotos && (
+                        <span className="text-[10px] text-gray-400 flex items-center gap-0.5">
+                          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/>
+                          </svg>
+                          {item.photos.length}
+                        </span>
+                      )}
+                    </div>
                     <p className="text-xs text-gray-500 truncate">{item.title}</p>
                   </div>
                 </div>
