@@ -1,4 +1,4 @@
-import{r as s,j as e,g as H,R as V}from"./index-6kPxajW-.js";import{M as O}from"./Modal-CxQZ72Xo.js";import{B as _}from"./BackButton-DbbMP1Kb.js";import{I as q}from"./ImageWithLoader-CM5GE_u_.js";function B({item:n,onComplete:d,onEdit:x,onDelete:u}){const[o,k]=s.useState(!1),N=a=>{a.stopPropagation(),k(!0),setTimeout(()=>d(n.id),300)},w=a=>{a.stopPropagation(),u(n.id)};return e.jsxs("div",{className:`
+import{r as s,j as e,g as H,R as V}from"./index-DBWk1iYt.js";import{M as O}from"./Modal-Chi5wKBD.js";import{B as _}from"./BackButton-Bp4HCmAw.js";import{I as q}from"./ImageWithLoader-LsTiAbU_.js";function B({item:n,onComplete:d,onEdit:x,onDelete:u}){const[o,k]=s.useState(!1),N=a=>{a.stopPropagation(),k(!0),setTimeout(()=>d(n.id),300)},w=a=>{a.stopPropagation(),u(n.id)};return e.jsxs("div",{className:`
         flex items-center gap-2 px-3 py-3 rounded-2xl transition-all duration-300
         ${o?"opacity-0 -translate-x-8 scale-95":"opacity-100"}
         ${n.type==="urgent"?"bg-pink/10":"bg-gray-100"}
