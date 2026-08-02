@@ -30,7 +30,7 @@ export default function InspirationCard({ item, selected, onToggle, onDelete, on
       <div className="flex items-start justify-between gap-3">
         {/* 标题区域 - 点击展开/收起 */}
         <div className="flex-1 min-w-0 cursor-pointer" onClick={() => setExpanded(!expanded)}>
-          <h3 className="font-semibold text-black text-base leading-snug">
+          <h3 className="font-semibold text-black text-base leading-snug whitespace-pre-wrap">
             {item.title}
           </h3>
           {/* 展开后显示详细内容 - 保留换行格式 */}

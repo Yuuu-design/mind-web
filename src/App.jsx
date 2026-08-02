@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import Welcome from './pages/Welcome'
 import TaskInput from './pages/TaskInput'
 import Home from './pages/Home'
@@ -9,11 +9,18 @@ import { loadData, saveData } from './utils/storage'
 import { getTodayStr } from './utils/date'
 import { GlobalLoading } from './components/Loading'
 
+// Tab 顺序（底部导航从左到右）
+const TAB_ORDER = { inspiration: 0, home: 1, todo: 2 }
+const TABS = new Set(['inspiration', 'home', 'todo'])
+// 子页面（从主页向上滑入）
+const SUB_PAGES = new Set(['welcome', 'urgent', 'settings', 'normal', 'datePicker'])
+
 export default function App() {
   const [data, setData] = useState(loadData)
   const [page, setPage] = useState('welcome') // welcome 是入口
   const [activeDate, setActiveDate] = useState(null)
   const [darkMode, setDarkMode] = useState(false)
+  const prevPageRef = useRef('welcome')
 
   // 持久化
   useEffect(() => {
@@ -56,7 +63,7 @@ export default function App() {
       inspirations: [newItem, ...prev.inspirations]
     }))
     if (!synthesized) {
-      setPage('home')
+      navigateTo('home')
     }
   }
 
@@ -175,18 +182,45 @@ export default function App() {
   const handleReset = () => {
     if (confirm('确定要重置所有数据吗？')) {
       setData({ inspirations: [], todos: [], streak: 0, lastDate: null })
-      setPage('welcome')
+      navigateTo('welcome')
     }
+  }
+
+  // 根据导航方向决定页面切换动画
+  const getPageAnimation = (from, to) => {
+    const [fromPage] = from.split('?')
+    const [toPage] = to.split('?')
+
+    // 两个都是 tab 页 → 根据左右位置决定滑入方向
+    if (TABS.has(fromPage) && TABS.has(toPage)) {
+      return TAB_ORDER[toPage] > TAB_ORDER[fromPage]
+        ? 'animate-slide-left'
+        : 'animate-slide-right'
+    }
+
+    // 进入子页面 → 向上滑入
+    if (SUB_PAGES.has(toPage)) {
+      return 'animate-slide-up-page'
+    }
+
+    // 其他情况（返回等）→ 淡入
+    return 'animate-fade-page'
+  }
+
+  const [pageAnim, setPageAnim] = useState('animate-slide-left')
+
+  // 统一导航函数（更新动画 + 记录来源页）
+  const navigateTo = (target) => {
+    setPageAnim(getPageAnimation(page, target))
+    prevPageRef.current = page
+    setPage(target)
   }
 
   // 导航
   const handleChangeNav = (key) => {
     console.log('handleChangeNav called with key:', key)
-    if (key === 'plus') {
-      setPage('welcome')
-    } else {
-      setPage(key)
-    }
+    const target = key === 'plus' ? 'welcome' : key
+    navigateTo(target)
   }
 
   // 渲染当前页面
@@ -201,8 +235,8 @@ export default function App() {
         return (
           <Welcome
             onAddInspiration={handleAddInspirationStay}
-            onGoUrgent={() => setPage('urgent')}
-            onGoHome={() => setPage('home')}
+            onGoUrgent={() => navigateTo('urgent')}
+            onGoHome={() => navigateTo('home')}
             fromInspiration={fromInspiration}
           />
         )
@@ -210,8 +244,8 @@ export default function App() {
         return (
           <TaskInput
             onAddTodo={handleAddTodo}
-            onBack={() => setPage('welcome')}
-            onGoHome={() => setPage('home')}
+            onBack={() => navigateTo('welcome')}
+            onGoHome={() => navigateTo('home')}
           />
         )
       case 'home':
@@ -266,7 +300,7 @@ export default function App() {
 
   return (
     <div className="h-full w-full overflow-hidden relative">
-      <div key={page} className="h-full w-full animate-page-enter">
+      <div key={page} className={`h-full w-full ${pageAnim}`}>
         {renderPage()}
       </div>
     </div>
