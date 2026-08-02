@@ -195,7 +195,7 @@ export default function Home({
             </p>
             <h3 className="text-lg font-bold text-black mb-3">{selectedInspiration.title}</h3>
             {selectedInspiration.detail && (
-              <p className="text-sm text-gray-500 leading-relaxed mb-4">{selectedInspiration.detail}</p>
+              <p className="text-sm text-gray-500 leading-relaxed mb-4 whitespace-pre-wrap">{selectedInspiration.detail}</p>
             )}
             {selectedInspiration.photos && selectedInspiration.photos.length > 0 && (
               <div className="flex gap-2 flex-wrap mb-4">

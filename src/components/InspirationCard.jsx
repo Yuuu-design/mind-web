@@ -33,9 +33,9 @@ export default function InspirationCard({ item, selected, onToggle, onDelete, on
           <h3 className="font-semibold text-black text-base leading-snug">
             {item.title}
           </h3>
-          {/* 展开后显示详细内容 */}
+          {/* 展开后显示详细内容 - 保留换行格式 */}
           {expanded && item.detail && (
-            <p className="mt-2 text-sm text-gray-500 leading-relaxed animate-fade-in">
+            <p className="mt-2 text-sm text-gray-500 leading-relaxed animate-fade-in whitespace-pre-wrap">
               {item.detail}
             </p>
           )}

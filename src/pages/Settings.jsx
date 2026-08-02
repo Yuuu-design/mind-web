@@ -192,7 +192,7 @@ export default function Settings({
                 {archived.map(i => (
                   <div key={i.id} className="bg-gray-50 rounded-xl p-3">
                     <div className="font-medium text-sm text-black">{i.title}</div>
-                    {i.detail && <div className="text-xs text-gray-500 mt-1">{i.detail}</div>}
+                    {i.detail && <div className="text-xs text-gray-500 mt-1 whitespace-pre-wrap">{i.detail}</div>}
                     <div className="text-[10px] text-gray-400 mt-2">{i.time || i.date}</div>
                   </div>
                 ))}

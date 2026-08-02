@@ -26,10 +26,15 @@ export default function Todo({ todos, onComplete, onAddTodo, onUpdateTodo, onDel
   const normalTodos = todaysTodos.filter(t => t.type === 'normal')
 
   // 检测是否完成所有待办，触发彩带
+  const confettiTriggered = useRef(false)
   useEffect(() => {
-    if (prevTodosCount > 0 && todaysTodos.length === 0) {
+    if (prevTodosCount > 0 && todaysTodos.length === 0 && !confettiTriggered.current) {
+      confettiTriggered.current = true
       setShowConfetti(true)
       setTimeout(() => setShowConfetti(false), 3000)
+    }
+    if (todaysTodos.length > 0) {
+      confettiTriggered.current = false
     }
     setPrevTodosCount(todaysTodos.length)
   }, [todaysTodos.length])
